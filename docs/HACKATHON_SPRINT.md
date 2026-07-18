@@ -27,16 +27,16 @@ Ship one polished, reliable demonstration of mission governance using Bible in 3
 
 ## Build sequence
 
-### Checkpoint 1 â€” Dashboard shell
+### Checkpoint 1 — Dashboard shell
 
 - Load `data/demo-mission.json`.
 - Render mission identity, health, confidence, progress, stage, blockers, and next action.
 - Render tasks with executor, status, reason, and next action.
 - Render recent activity and decisions.
 
-**Exit criterion:** A new viewer can answer â€œAre we on track, what is blocked, and what happens next?â€ within five seconds.
+**Exit criterion:** A new viewer can answer “Are we on track, what is blocked, and what happens next?” within five seconds.
 
-### Checkpoint 2 â€” Governance loop
+### Checkpoint 2 — Governance loop
 
 - Add the human approval panel.
 - Implement approve and request-changes actions.
@@ -45,7 +45,7 @@ Ship one polished, reliable demonstration of mission governance using Bible in 3
 
 **Exit criterion:** The full handoff-and-continuation loop works repeatedly without network access.
 
-### Checkpoint 3 â€” Product polish
+### Checkpoint 3 — Product polish
 
 - Clarify information hierarchy and responsive layout.
 - Add useful empty, loading, and error states.
@@ -54,7 +54,7 @@ Ship one polished, reliable demonstration of mission governance using Bible in 3
 
 **Exit criterion:** The centerpiece screen feels coherent and presentation-ready.
 
-### Checkpoint 4 â€” Submission
+### Checkpoint 4 — Submission
 
 - Rehearse until the demo is consistently under three minutes.
 - Record a clean backup demo.

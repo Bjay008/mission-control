@@ -26,7 +26,7 @@
   },
   "mission": {
     "id": "bible-365-day-001",
-    "name": "Bible in 365 Days â€” Day 1",
+    "name": "Bible in 365 Days — Day 1",
     "objective": "Publish one accurate, engaging, high-quality Bible in 365 Days episode every day.",
     "successCriteria": [
       "Script is grounded in the assigned passage",
@@ -103,7 +103,7 @@
   "tasks": [
     {
       "id": "task-research",
-      "title": "Research Genesis 1â€“3",
+      "title": "Research Genesis 1–3",
       "stage": "Editorial",
       "state": "complete",
       "executorId": "agent-research",

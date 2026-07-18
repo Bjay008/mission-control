@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="description" content="Mission Control dashboard for long-running AI missions">
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Ccircle cx='32' cy='32' r='7' fill='%2377e6b4'/%3E%3Cellipse cx='32' cy='32' rx='25' ry='13' fill='none' stroke='%2377e6b4' stroke-width='3' transform='rotate(-28 32 32)'/%3E%3C/svg%3E">
-  <title>Mission Control â€” Mission Health</title>
+  <title>Mission Control — Mission Health</title>
   <link rel="stylesheet" href="/app/styles.css">
 </head>
 <body>
@@ -16,18 +16,18 @@
       <div class="brand-mark" aria-hidden="true"><span class="brand-orbit"></span><span class="brand-core"></span></div>
       <div class="brand-copy"><strong>Mission Control</strong><span>Governance layer</span></div>
       <nav class="nav-list" aria-label="Dashboard sections">
-        <a class="nav-item is-active" href="#overview" aria-current="page"><span class="nav-icon" aria-hidden="true">âŒ</span>Overview</a>
-        <a class="nav-item" href="#workflow"><span class="nav-icon" aria-hidden="true">â†³</span>Workflow</a>
-        <a class="nav-item" href="#history"><span class="nav-icon" aria-hidden="true">â‰¡</span>History</a>
+        <a class="nav-item is-active" href="#overview" aria-current="page"><span class="nav-icon" aria-hidden="true">⌁</span>Overview</a>
+        <a class="nav-item" href="#workflow"><span class="nav-icon" aria-hidden="true">↳</span>Workflow</a>
+        <a class="nav-item" href="#history"><span class="nav-icon" aria-hidden="true">≡</span>History</a>
       </nav>
-      <div class="sidebar-footer"><span class="live-dot" aria-hidden="true"></span><div><strong>Demo environment</strong><span>Local Â· deterministic</span></div></div>
+      <div class="sidebar-footer"><span class="live-dot" aria-hidden="true"></span><div><strong>Demo environment</strong><span>Local · deterministic</span></div></div>
     </aside>
 
     <main class="main" id="main-content" tabindex="-1">
       <header class="topbar">
         <div>
           <p class="eyebrow">Active mission</p>
-          <div class="mission-identity"><h1 id="mission-name">Loading missionâ€¦</h1><span class="mission-id" id="mission-id"></span></div>
+          <div class="mission-identity"><h1 id="mission-name">Loading mission…</h1><span class="mission-id" id="mission-id"></span></div>
         </div>
         <div class="topbar-actions"><span class="updated-label" id="updated-label">Source: demo-mission.json</span><button class="button button-quiet" id="reset-button" type="button">Reset demo</button></div>
       </header>
@@ -43,7 +43,7 @@
             <article class="health-card surface">
               <div class="health-primary">
                 <div class="confidence-ring" id="confidence-ring" role="img" aria-label="Confidence 0 percent"><div class="confidence-inner"><span class="confidence-value" id="confidence-value">0%</span><span class="confidence-label">confidence</span></div></div>
-                <div class="health-copy"><span class="section-label">Current assessment</span><h3 id="health-label">â€”</h3><p id="health-summary"></p></div>
+                <div class="health-copy"><span class="section-label">Current assessment</span><h3 id="health-label">—</h3><p id="health-summary"></p></div>
               </div>
               <div class="progress-block">
                 <div class="progress-meta"><span>Mission progress</span><strong id="progress-value">0%</strong></div>
@@ -54,15 +54,15 @@
 
             <article class="next-action-card surface" id="next-action-card">
               <div class="action-kicker"><span class="action-pulse" aria-hidden="true"></span>Recommended next action</div>
-              <h3 id="next-action-label">â€”</h3>
+              <h3 id="next-action-label">—</h3>
               <p id="next-action-reason"></p>
               <dl class="action-details">
-                <div><dt>Owner</dt><dd id="next-action-owner">â€”</dd></div>
-                <div><dt>Human needed</dt><dd id="human-required">â€”</dd></div>
+                <div><dt>Owner</dt><dd id="next-action-owner">—</dd></div>
+                <div><dt>Human needed</dt><dd id="human-required">—</dd></div>
               </dl>
               <div class="approval-preview" id="approval-preview">
                 <span class="section-label">Revised creative direction</span>
-                <div class="thumbnail-brief" aria-label="Text-free thumbnail brief preview"><span class="thumbnail-light"></span><span class="thumbnail-horizon"></span><span class="thumbnail-figure"></span><div><strong>Day 1 Â· The beginning</strong><small>Text-free Â· cinematic dawn Â· clear focal point</small></div></div>
+                <div class="thumbnail-brief" aria-label="Text-free thumbnail brief preview"><span class="thumbnail-light"></span><span class="thumbnail-horizon"></span><span class="thumbnail-figure"></span><div><strong>Day 1 · The beginning</strong><small>Text-free · cinematic dawn · clear focal point</small></div></div>
               </div>
               <div class="action-buttons" id="approval-actions"><button class="button button-primary" id="approve-button" type="button">Approve &amp; continue</button><button class="button button-secondary" id="changes-button" type="button">Request changes</button></div>
             </article>
@@ -70,14 +70,14 @@
 
           <article class="blocker-strip" id="blocker-strip" aria-labelledby="blocker-title">
             <div class="blocker-icon" aria-hidden="true">!</div>
-            <div class="blocker-main"><span class="section-label">Active blocker</span><h3 id="blocker-title">â€”</h3><p id="blocker-cause"></p></div>
-            <div class="blocker-resolution"><span>Resolution</span><strong id="blocker-resolution">â€”</strong></div>
+            <div class="blocker-main"><span class="section-label">Active blocker</span><h3 id="blocker-title">—</h3><p id="blocker-cause"></p></div>
+            <div class="blocker-resolution"><span>Resolution</span><strong id="blocker-resolution">—</strong></div>
           </article>
         </section>
 
         <section class="workflow-section" id="workflow" aria-labelledby="workflow-heading">
           <div class="section-heading">
-            <div><p class="eyebrow">Capability-aware routing</p><h2 id="workflow-heading">Who owns what â€” and why</h2></div>
+            <div><p class="eyebrow">Capability-aware routing</p><h2 id="workflow-heading">Who owns what — and why</h2></div>
             <div class="executor-legend" aria-label="Executor types"><span><i class="legend-dot executor-ai"></i>AI agent</span><span><i class="legend-dot executor-tool"></i>Connected tool</span><span><i class="legend-dot executor-human"></i>Human</span></div>
           </div>
           <div class="stage-rail" id="stage-rail" aria-label="Mission stages"></div>
@@ -98,7 +98,7 @@
         <footer class="data-footer"><span>Source: <code>data/demo-mission.json</code></span><span>Progress is saved in this browser. Reset demo clears it.</span></footer>
       </div>
 
-      <section class="loading-state surface" id="loading-state" aria-live="polite"><span class="loading-spinner" aria-hidden="true"></span><div><strong>Loading mission state</strong><p>Reading data/demo-mission.jsonâ€¦</p></div></section>
+      <section class="loading-state surface" id="loading-state" aria-live="polite"><span class="loading-spinner" aria-hidden="true"></span><div><strong>Loading mission state</strong><p>Reading data/demo-mission.json…</p></div></section>
       <section class="error-state surface" id="error-state" hidden role="alert"><span aria-hidden="true">!</span><div><strong>Mission data could not be loaded</strong><p id="error-message"></p></div></section>
     </main>
   </div>

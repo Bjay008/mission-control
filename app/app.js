@@ -65,7 +65,7 @@ function escapeHtml(value) {
 }
 
 function humanize(value) {
-  return String(value ?? "â€”").replaceAll("_", " ");
+  return String(value ?? "—").replaceAll("_", " ");
 }
 
 function slugClass(value) {
@@ -98,12 +98,12 @@ function getExecutor(executorId) {
 
 function stateSymbol(taskState) {
   return {
-    complete: "âœ“",
+    complete: "✓",
     blocked: "!",
-    awaiting_human: "â—‰",
-    active: "â†’",
-    pending: "Â·"
-  }[taskState] ?? "Â·";
+    awaiting_human: "◉",
+    active: "→",
+    pending: "·"
+  }[taskState] ?? "·";
 }
 
 function showToast(message) {
@@ -117,7 +117,7 @@ function renderMissionHeader() {
   const { mission } = state;
   elements.missionName.textContent = mission.name;
   elements.missionId.textContent = mission.id;
-  elements.updatedLabel.textContent = `Updated ${formatDateTime(mission.updatedAt)} Â· demo-mission.json`;
+  elements.updatedLabel.textContent = `Updated ${formatDateTime(mission.updatedAt)} · demo-mission.json`;
 }
 
 function renderHealth() {
@@ -159,7 +159,7 @@ function renderNextAction() {
   elements.nextActionLabel.textContent = action.label;
   elements.nextActionReason.textContent = action.reason;
   elements.nextActionOwner.textContent = action.owner;
-  elements.humanRequired.textContent = mission.humanRequired ? "Yes Â· approval gate" : "No Â· ready to proceed";
+  elements.humanRequired.textContent = mission.humanRequired ? "Yes · approval gate" : "No · ready to proceed";
   elements.approvalPreview.hidden = !isApproval;
   elements.approvalActions.hidden = !isApproval;
 }
@@ -171,7 +171,7 @@ function renderBlocker() {
 
   if (isResolved) {
     elements.blockerStrip.querySelector(".section-label").textContent = "Blocker status";
-    elements.blockerStrip.querySelector(".blocker-icon").textContent = "âœ“";
+    elements.blockerStrip.querySelector(".blocker-icon").textContent = "✓";
     elements.blockerTitle.textContent = "Critical path is clear";
     elements.blockerCause.textContent = "The thumbnail approval gate was resolved and downstream work can continue.";
     elements.blockerResolution.textContent = "Quality review is now active.";
@@ -214,7 +214,7 @@ function renderTasks() {
           </div>
           <span class="executor-chip executor-${escapeHtml(executor.type)}"><i></i><span>${escapeHtml(executor.name)}</span></span>
           <span class="state-chip ${stateClass}">${escapeHtml(humanize(task.state))}</span>
-          <span class="task-chevron" aria-hidden="true">âŒ„</span>
+          <span class="task-chevron" aria-hidden="true">⌄</span>
         </summary>
         <div class="task-detail">
           <div><strong>Why this executor</strong><span>${escapeHtml(task.routingReason)}</span></div>
@@ -232,7 +232,7 @@ function renderActivity() {
       <span class="activity-node ${escapeHtml(activity.type)}" aria-hidden="true"></span>
       <div class="activity-copy">
         <p>${escapeHtml(activity.message)}</p>
-        <div class="activity-meta"><strong>${escapeHtml(activity.actor)}</strong><span>Â·</span><time datetime="${escapeHtml(activity.timestamp)}">${escapeHtml(formatTime(activity.timestamp))}</time></div>
+        <div class="activity-meta"><strong>${escapeHtml(activity.actor)}</strong><span>·</span><time datetime="${escapeHtml(activity.timestamp)}">${escapeHtml(formatTime(activity.timestamp))}</time></div>
       </div>
     </li>
   `).join("");
@@ -245,7 +245,7 @@ function renderDecisions() {
       <h3>${escapeHtml(decision.choice)}</h3>
       <p>${escapeHtml(decision.rationale)}</p>
       <div class="decision-effect">${escapeHtml(decision.effect)}</div>
-      <div class="decision-meta">${escapeHtml(decision.actor)} Â· <time datetime="${escapeHtml(decision.timestamp)}">${escapeHtml(formatDateTime(decision.timestamp))}</time></div>
+      <div class="decision-meta">${escapeHtml(decision.actor)} · <time datetime="${escapeHtml(decision.timestamp)}">${escapeHtml(formatDateTime(decision.timestamp))}</time></div>
     </article>
   `).join("");
 }

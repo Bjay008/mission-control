@@ -19,5 +19,5 @@
 
 ## Decision rule
 
-Every proposed feature must answer: Does this make the missionâ€™s health, ownership, blocker, or next move clearer? If not, move it to the post-hackathon backlog.
+Every proposed feature must answer: Does this make the mission’s health, ownership, blocker, or next move clearer? If not, move it to the post-hackathon backlog.
 

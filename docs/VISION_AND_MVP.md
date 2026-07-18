@@ -56,7 +56,7 @@ A user should understand within five seconds:
 
 ## Success test
 
-The demo succeeds when a judge can accurately describe the product as: â€œThis is not another AI chat; it is Mission Control for work that must actually get finished.â€
+The demo succeeds when a judge can accurately describe the product as: “This is not another AI chat; it is Mission Control for work that must actually get finished.”
 
 ## MVP boundary
 
