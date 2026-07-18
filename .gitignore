@@ -1,0 +1,22 @@
+# Dependencies and builds
+node_modules/
+dist/
+build/
+.next/
+
+# Local configuration and secrets
+.env
+.env.*
+!.env.example
+
+# Test and tool output
+coverage/
+.cache/
+*.log
+
+# Editor and OS files
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+

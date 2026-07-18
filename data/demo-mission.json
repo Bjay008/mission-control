@@ -1,0 +1,390 @@
+{
+  "schemaVersion": 1,
+  "sourceRevision": "bible-365-day-001-v1",
+  "healthPolicy": {
+    "baseConfidence": 92,
+    "thresholds": [
+      { "minimum": 80, "health": "on_track", "label": "On track" },
+      { "minimum": 50, "health": "at_risk", "label": "At risk" },
+      { "minimum": 0, "health": "off_track", "label": "Off track" }
+    ],
+    "deductions": {
+      "humanApprovalRequired": 5,
+      "activeHumanReview": 6,
+      "riskPenalty": 1,
+      "schedule": {
+        "at_risk": 5,
+        "off_track": 12
+      },
+      "blockerSeverity": {
+        "low": 2,
+        "medium": 5,
+        "high": 10,
+        "critical": 20
+      }
+    }
+  },
+  "mission": {
+    "id": "bible-365-day-001",
+    "name": "Bible in 365 Days â€” Day 1",
+    "objective": "Publish one accurate, engaging, high-quality Bible in 365 Days episode every day.",
+    "successCriteria": [
+      "Script is grounded in the assigned passage",
+      "Theological and quality review is approved",
+      "Production assets meet the channel standard",
+      "Episode is ready to publish by 18:00 local time"
+    ],
+    "health": "at_risk",
+    "healthLabel": "At risk",
+    "confidence": 72,
+    "progress": 38,
+    "currentStage": "Day 1 production",
+    "humanRequired": true,
+    "nextRecommendedAction": {
+      "label": "Review thumbnail brief",
+      "taskId": "task-thumbnail-approval",
+      "owner": "Content lead",
+      "reason": "The image tool failed twice and the revised creative direction requires human judgment."
+    },
+    "updatedAt": "2026-07-18T09:42:00+02:00"
+  },
+  "healthSignals": {
+    "schedule": "at_risk",
+    "quality": "on_track",
+    "blockerSeverity": "high",
+    "momentum": "slowing",
+    "summary": "Research and script are complete, but thumbnail failure blocks the approval and publishing path.",
+    "riskPenalty": 0
+  },
+  "blockers": [
+    {
+      "id": "blocker-thumbnail-001",
+      "title": "Thumbnail generation failed",
+      "severity": "high",
+      "taskId": "task-thumbnail-generate",
+      "cause": "The connected image tool returned unusable text rendering on two attempts.",
+      "owner": "Content lead",
+      "resolution": "Approve the revised text-free thumbnail brief before retrying.",
+      "createdAt": "2026-07-18T09:34:00+02:00"
+    }
+  ],
+  "executors": [
+    {
+      "id": "agent-research",
+      "type": "ai",
+      "name": "Scripture Research Agent",
+      "capabilities": ["passage analysis", "cross-reference collection", "source synthesis"]
+    },
+    {
+      "id": "agent-writer",
+      "type": "ai",
+      "name": "Episode Writing Agent",
+      "capabilities": ["script drafting", "devotional writing", "metadata drafting"]
+    },
+    {
+      "id": "tool-image",
+      "type": "tool",
+      "name": "Connected Image Tool",
+      "capabilities": ["thumbnail generation"]
+    },
+    {
+      "id": "human-content-lead",
+      "type": "human",
+      "name": "Content Lead",
+      "capabilities": ["theological judgment", "quality approval", "brand approval"]
+    },
+    {
+      "id": "tool-youtube",
+      "type": "tool",
+      "name": "YouTube Publishing Tool",
+      "capabilities": ["upload", "metadata update", "scheduled publishing"]
+    }
+  ],
+  "tasks": [
+    {
+      "id": "task-research",
+      "title": "Research Genesis 1â€“3",
+      "stage": "Editorial",
+      "state": "complete",
+      "executorId": "agent-research",
+      "routingReason": "High-volume synthesis with clear source boundaries is suitable for an AI research agent.",
+      "nextAction": "None",
+      "progressWeight": 14,
+      "dependsOn": [],
+      "artifactIds": ["artifact-research-notes"]
+    },
+    {
+      "id": "task-script",
+      "title": "Draft Day 1 episode script",
+      "stage": "Editorial",
+      "state": "complete",
+      "executorId": "agent-writer",
+      "routingReason": "The task is generative, reversible, and constrained by approved research notes.",
+      "nextAction": "Send to human quality review after production assets are ready.",
+      "progressWeight": 24,
+      "dependsOn": ["task-research"],
+      "artifactIds": ["artifact-script-v1"]
+    },
+    {
+      "id": "task-thumbnail-generate",
+      "title": "Generate thumbnail",
+      "stage": "Production",
+      "state": "blocked",
+      "executorId": "tool-image",
+      "routingReason": "A connected image tool can produce the visual asset from an approved creative brief.",
+      "nextAction": "Wait for approval of the revised brief, then retry.",
+      "progressWeight": 10,
+      "dependsOn": ["task-script", "task-thumbnail-approval"],
+      "artifactIds": ["artifact-thumbnail-failed"]
+    },
+    {
+      "id": "task-thumbnail-approval",
+      "title": "Review revised thumbnail brief",
+      "stage": "Production",
+      "state": "awaiting_human",
+      "executorId": "human-content-lead",
+      "routingReason": "The retry changes creative direction and needs accountable human brand judgment.",
+      "nextAction": "Approve or request changes.",
+      "progressWeight": 4,
+      "dependsOn": ["task-script"],
+      "artifactIds": ["artifact-thumbnail-brief-v2"]
+    },
+    {
+      "id": "task-quality-review",
+      "title": "Theological and quality review",
+      "stage": "Review",
+      "state": "pending",
+      "executorId": "human-content-lead",
+      "routingReason": "Theological accuracy and publication quality require accountable human approval.",
+      "nextAction": "Begin after required production assets are complete.",
+      "progressWeight": 28,
+      "dependsOn": ["task-script", "task-thumbnail-generate"],
+      "artifactIds": []
+    },
+    {
+      "id": "task-publish",
+      "title": "Schedule episode on YouTube",
+      "stage": "Publishing",
+      "state": "pending",
+      "executorId": "tool-youtube",
+      "routingReason": "The connected tool can perform a scoped external action after explicit human approval.",
+      "nextAction": "Wait for quality approval.",
+      "progressWeight": 20,
+      "dependsOn": ["task-quality-review"],
+      "artifactIds": []
+    }
+  ],
+  "recentActivity": [
+    {
+      "id": "activity-004",
+      "timestamp": "2026-07-18T09:42:00+02:00",
+      "type": "recommendation_created",
+      "actor": "Mission Health Engine",
+      "message": "Human review of the revised thumbnail brief is now the highest-leverage next action."
+    },
+    {
+      "id": "activity-003",
+      "timestamp": "2026-07-18T09:36:00+02:00",
+      "type": "task_routed",
+      "actor": "Capability Engine",
+      "message": "Revised thumbnail brief routed to Content Lead for approval."
+    },
+    {
+      "id": "activity-002",
+      "timestamp": "2026-07-18T09:34:00+02:00",
+      "type": "task_blocked",
+      "actor": "Mission Orchestrator",
+      "message": "Thumbnail generation blocked after the second unusable result."
+    },
+    {
+      "id": "activity-001",
+      "timestamp": "2026-07-18T09:12:00+02:00",
+      "type": "task_completed",
+      "actor": "Episode Writing Agent",
+      "message": "Day 1 episode script completed and stored as version 1."
+    }
+  ],
+  "decisions": [
+    {
+      "id": "decision-001",
+      "timestamp": "2026-07-18T09:35:00+02:00",
+      "actor": "Mission Orchestrator",
+      "choice": "Pause automatic thumbnail retries",
+      "rationale": "Repeated failures reduced confidence; a human-approved change of creative direction is safer than another identical retry.",
+      "effect": "Created a human approval gate and marked the mission at risk."
+    }
+  ],
+  "artifacts": [
+    {
+      "id": "artifact-research-notes",
+      "name": "Day 1 research notes",
+      "type": "research_notes",
+      "producedByTaskId": "task-research",
+      "reviewState": "accepted",
+      "version": 1,
+      "uri": "demo://artifacts/day-1-research-notes"
+    },
+    {
+      "id": "artifact-script-v1",
+      "name": "Day 1 episode script",
+      "type": "script",
+      "producedByTaskId": "task-script",
+      "reviewState": "pending_final_review",
+      "version": 1,
+      "uri": "demo://artifacts/day-1-script-v1"
+    },
+    {
+      "id": "artifact-thumbnail-failed",
+      "name": "Thumbnail attempt 2",
+      "type": "image",
+      "producedByTaskId": "task-thumbnail-generate",
+      "reviewState": "rejected",
+      "version": 2,
+      "uri": "demo://artifacts/day-1-thumbnail-attempt-2"
+    },
+    {
+      "id": "artifact-thumbnail-brief-v2",
+      "name": "Revised text-free thumbnail brief",
+      "type": "creative_brief",
+      "producedByTaskId": "task-thumbnail-approval",
+      "reviewState": "awaiting_approval",
+      "version": 2,
+      "uri": "demo://artifacts/day-1-thumbnail-brief-v2"
+    }
+  ],
+  "transitions": [
+    {
+      "id": "approve-thumbnail-brief",
+      "action": "approve",
+      "toast": "Approval recorded. Mission health improved to On track.",
+      "when": {
+        "taskStates": [
+          { "taskId": "task-thumbnail-approval", "state": "awaiting_human" }
+        ]
+      },
+      "effects": {
+        "taskUpdates": [
+          {
+            "taskId": "task-thumbnail-approval",
+            "updates": {
+              "state": "complete",
+              "nextAction": "Approved. No further action required."
+            }
+          },
+          {
+            "taskId": "task-thumbnail-generate",
+            "updates": {
+              "state": "complete",
+              "nextAction": "Thumbnail generated from approved brief."
+            }
+          },
+          {
+            "taskId": "task-quality-review",
+            "updates": {
+              "state": "active",
+              "nextAction": "Content Lead reviews the script and production package."
+            }
+          }
+        ],
+        "removeBlockerIds": ["blocker-thumbnail-001"],
+        "mission": {
+          "humanRequired": false,
+          "nextRecommendedAction": {
+            "label": "Run theological and quality review",
+            "taskId": "task-quality-review",
+            "owner": "Content Lead",
+            "reason": "The thumbnail is complete, so the production package is ready for the required accountable review."
+          }
+        },
+        "healthSignals": {
+          "schedule": "on_track",
+          "momentum": "restored",
+          "riskPenalty": 0,
+          "summary": "The human approval unblocked production. The complete package is now ready for theological and quality review."
+        }
+      },
+      "activity": [
+        {
+          "type": "task_completed",
+          "actor": "Mission Orchestrator",
+          "message": "Thumbnail generated from the approved creative brief; quality review is now active."
+        },
+        {
+          "type": "approval_granted",
+          "actor": "Content Lead",
+          "message": "Approved the revised text-free thumbnail brief."
+        }
+      ],
+      "decision": {
+        "actor": "Content Lead",
+        "choice": "Approve revised thumbnail brief",
+        "rationale": "The text-free direction avoids the image tool's typography failure while preserving a strong visual focal point.",
+        "effect": "Unblocked thumbnail generation and activated theological and quality review."
+      }
+    },
+    {
+      "id": "request-thumbnail-brief-changes",
+      "action": "request_changes",
+      "toast": "Feedback recorded. The brief is back in revision.",
+      "when": {
+        "taskStates": [
+          { "taskId": "task-thumbnail-approval", "state": "awaiting_human" }
+        ]
+      },
+      "effects": {
+        "taskUpdates": [
+          {
+            "taskId": "task-thumbnail-approval",
+            "updates": {
+              "state": "active",
+              "executorId": "agent-writer",
+              "nextAction": "Revise the creative brief using the Content Lead's feedback."
+            }
+          }
+        ],
+        "mission": {
+          "humanRequired": false,
+          "nextRecommendedAction": {
+            "label": "Revise thumbnail brief",
+            "taskId": "task-thumbnail-approval",
+            "owner": "Episode Writing Agent",
+            "reason": "The Content Lead requested a clearer focal point before another image-generation attempt."
+          }
+        },
+        "healthSignals": {
+          "momentum": "slowing",
+          "riskPenalty": 9,
+          "summary": "The human review prevented a weak creative direction from advancing. A focused brief revision is now active."
+        }
+      },
+      "activity": [
+        {
+          "type": "changes_requested",
+          "actor": "Content Lead",
+          "message": "Requested a clearer visual focal point in the thumbnail brief."
+        }
+      ],
+      "decision": {
+        "actor": "Content Lead",
+        "choice": "Request changes to thumbnail brief",
+        "rationale": "The revised direction is safer technically but does not yet create enough visual hierarchy.",
+        "effect": "Routed the brief back for revision while keeping the mission at risk."
+      }
+    }
+  ],
+  "approvalTransitionPreview": {
+    "trigger": "Approve revised thumbnail brief",
+    "updates": {
+      "mission.health": "on_track",
+      "mission.healthLabel": "On track",
+      "mission.confidence": 86,
+      "mission.progress": 52,
+      "mission.humanRequired": false,
+      "mission.nextRecommendedAction.label": "Run theological and quality review",
+      "task-thumbnail-approval.state": "complete",
+      "task-thumbnail-generate.state": "complete",
+      "task-quality-review.state": "active"
+    }
+  }
+}
+
