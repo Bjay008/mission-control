@@ -1,6 +1,6 @@
 # Architecture
 
-## Autonomous episode path
+## Governed episode path
 
 `Create Episode` starts one deterministic orchestration run:
 
@@ -15,10 +15,12 @@ flowchart LR
     VP --> T[Thumbnail adapter]
     T --> SEO[SEO]
     SEO --> QC[QC]
-    QC --> P[Upload package]
+    QC --> A{Creator approval}
+    A -->|Approve| P[Upload package]
+    A -->|Request changes| A
 ```
 
-`app/orchestration-engine.js` owns run state, ordered routing, artifact contracts, and the final handoff. It delegates health calculation and persistence validation to the existing deterministic mission engine. `data/episode-pipeline.json` is the source-controlled contract. The browser animates state returned by the engine; it does not invent stage completion independently.
+`app/orchestration-engine.js` owns run state, ordered routing, the post-QC creator checkpoint, artifact contracts, and the final handoff. It delegates health calculation, approval transitions, and persistence validation to the existing deterministic mission engine. `data/episode-pipeline.json` is the source-controlled contract. The browser animates state returned by the engine; it does not invent stage completion independently.
 
 Voice and thumbnail stages currently produce adapter manifests, and the final stage produces an upload manifest. No external AI, media-generation, or YouTube action occurs until a configured provider adapter is added later.
 
@@ -81,16 +83,17 @@ flowchart LR
 
 ```mermaid
 stateDiagram-v2
-    [*] --> Blocked: Thumbnail generation fails
-    Blocked --> AwaitingApproval: Human reviews revised brief
-    AwaitingApproval --> InProgress: Human approves
-    InProgress --> Healthy: Thumbnail task completes
-    Healthy --> [*]: Next task activated
+    [*] --> InProgress: Creator starts Day 32
+    InProgress --> AwaitingApproval: QC completes
+    AwaitingApproval --> AwaitingApproval: Creator requests changes
+    AwaitingApproval --> Packaging: Creator approves
+    Packaging --> ReadyForYouTube: Upload Package completes
+    ReadyForYouTube --> [*]
 ```
 
 ## Implemented MVP boundary
 
-The dashboard consumes `data/demo-mission.json` as its contract. `app/mission-engine.js` validates that contract, calculates weighted progress and confidence, applies declared transitions, and produces activity and decision records. Compatible state is saved in browser storage and invalidated when the source revision changes.
+The dashboard consumes `data/episode-pipeline.json` as its contract. `app/mission-engine.js` validates that contract, calculates weighted progress and confidence, applies declared approval transitions, and produces activity and decision records. Compatible state is saved in browser storage and invalidated when the source revision changes.
 
 External agents, image generation, publishing, and server-side durable storage remain deferred until the complete handoff-and-continuation loop is demonstrable.
 

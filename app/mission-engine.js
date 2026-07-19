@@ -173,6 +173,7 @@ export function applyMissionAction(input, action, options = {}) {
 
   assignDefined(state.mission, effects.mission);
   assignDefined(state.healthSignals, effects.healthSignals);
+  assignDefined(state.orchestration, effects.orchestration);
   state.mission.updatedAt = timestamp;
 
   const newActivity = (transition.activity ?? []).map((activity, index) => ({

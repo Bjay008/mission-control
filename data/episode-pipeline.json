@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "sourceRevision": "bible-365-autonomous-pipeline-v1",
+  "sourceRevision": "bible-365-creator-approval-v2",
   "healthPolicy": {
     "baseConfidence": 96,
     "thresholds": [
@@ -24,6 +24,7 @@
       "Every stage receives the accepted upstream artifact",
       "Every executor produces an inspectable output contract",
       "QC accepts the complete production manifest",
+      "A creator approves the episode before upload packaging begins",
       "No external upload occurs without a creator action"
     ],
     "health": "on_track",
@@ -59,6 +60,7 @@
     { "id": "adapter-thumbnail", "type": "tool", "name": "Thumbnail Adapter — Demo", "capabilities": ["thumbnail specification"] },
     { "id": "agent-seo", "type": "ai", "name": "SEO Agent", "capabilities": ["title", "description", "keywords"] },
     { "id": "agent-qc", "type": "ai", "name": "QC Agent", "capabilities": ["contract validation", "quality checks"] },
+    { "id": "human-creator", "type": "human", "name": "Creator", "capabilities": ["editorial judgment", "release approval"] },
     { "id": "tool-packager", "type": "tool", "name": "Upload Packager", "capabilities": ["manifest assembly", "handoff packaging"] }
   ],
   "tasks": [
@@ -71,7 +73,8 @@
     { "id": "task-thumbnail", "title": "Prepare the thumbnail specification", "stage": "Production", "state": "pending", "executorId": "adapter-thumbnail", "routingReason": "The demo adapter produces a deterministic creative specification for a future image tool.", "nextAction": "Wait for visual plan.", "progressWeight": 10, "dependsOn": ["task-visual"], "artifactIds": [] },
     { "id": "task-seo", "title": "Create the YouTube SEO package", "stage": "Distribution", "state": "pending", "executorId": "agent-seo", "routingReason": "SEO metadata is a reversible text artifact derived from the accepted episode narrative.", "nextAction": "Wait for thumbnail direction.", "progressWeight": 8, "dependsOn": ["task-thumbnail"], "artifactIds": [] },
     { "id": "task-qc", "title": "Run production quality control", "stage": "Governance", "state": "pending", "executorId": "agent-qc", "routingReason": "QC validates every required artifact contract before packaging.", "nextAction": "Wait for SEO package.", "progressWeight": 12, "dependsOn": ["task-seo"], "artifactIds": [] },
-    { "id": "task-upload-package", "title": "Assemble the upload package", "stage": "Distribution", "state": "pending", "executorId": "tool-packager", "routingReason": "The packager performs a deterministic local handoff and never publishes externally.", "nextAction": "Wait for QC acceptance.", "progressWeight": 14, "dependsOn": ["task-qc"], "artifactIds": [] }
+    { "id": "task-creator-approval", "title": "Approve the episode package", "stage": "Governance", "state": "pending", "executorId": "human-creator", "routingReason": "Final creator approval is required before preparing the external upload package.", "nextAction": "Wait for QC acceptance.", "progressWeight": 0, "dependsOn": ["task-qc"], "artifactIds": [] },
+    { "id": "task-upload-package", "title": "Assemble the upload package", "stage": "Distribution", "state": "pending", "executorId": "tool-packager", "routingReason": "The packager performs a deterministic local handoff after creator approval and never publishes externally.", "nextAction": "Wait for QC and creator approval.", "progressWeight": 14, "dependsOn": ["task-qc"], "artifactIds": [] }
   ],
   "recentActivity": [
     { "id": "activity-ready", "timestamp": "2026-07-19T09:00:00+02:00", "type": "pipeline_ready", "actor": "Mission Control", "message": "The frozen ten-stage episode workflow is ready for one-command execution." }
@@ -80,7 +83,80 @@
     { "id": "decision-scope-freeze", "timestamp": "2026-07-19T08:55:00+02:00", "actor": "CEO", "choice": "Freeze the hackathon production path", "rationale": "Only the CEO-to-upload workflow and its live interface help prove the winning story.", "effect": "All unrelated features remain outside Sprint 1 and Sprint 2." }
   ],
   "artifacts": [],
-  "transitions": [],
+  "transitions": [
+    {
+      "id": "approve-episode-package",
+      "action": "approve",
+      "when": { "taskStates": [{ "taskId": "task-creator-approval", "state": "awaiting_human" }] },
+      "effects": {
+        "taskUpdates": [
+          { "taskId": "task-creator-approval", "updates": { "state": "complete", "nextAction": "Creator approval recorded." } },
+          { "taskId": "task-upload-package", "updates": { "state": "active", "nextAction": "Executing now." } }
+        ],
+        "removeBlockerIds": ["blocker-creator-approval"],
+        "mission": {
+          "currentStage": "Upload Package",
+          "humanRequired": false,
+          "nextRecommendedAction": {
+            "label": "Upload Package is running",
+            "taskId": "task-upload-package",
+            "owner": "Upload Packager",
+            "reason": "The creator approved the QC report, so the deterministic handoff package can now be assembled."
+          }
+        },
+        "healthSignals": {
+          "schedule": "on_track",
+          "momentum": "accelerating",
+          "summary": "Creator approval is recorded. Mission Control resumed the critical path and activated Upload Package."
+        },
+        "orchestration": { "status": "running", "currentStageId": "upload-package" }
+      },
+      "activity": [
+        { "type": "approval_granted", "actor": "Creator", "message": "Creator approved the episode package. Mission Control resumed execution and activated Upload Package." }
+      ],
+      "decision": {
+        "actor": "Creator",
+        "choice": "Approve the episode package",
+        "rationale": "QC passed and the creator accepted the final editorial and release package.",
+        "effect": "Cleared the approval blocker and authorized deterministic upload packaging."
+      },
+      "toast": "Creator approval recorded. Upload Package is now running."
+    },
+    {
+      "id": "request-episode-package-changes",
+      "action": "request_changes",
+      "when": { "taskStates": [{ "taskId": "task-creator-approval", "state": "awaiting_human" }] },
+      "effects": {
+        "taskUpdates": [
+          { "taskId": "task-creator-approval", "updates": { "nextAction": "Review the requested changes, then approve when ready." } }
+        ],
+        "mission": {
+          "humanRequired": true,
+          "nextRecommendedAction": {
+            "label": "Review requested changes and approve the episode package",
+            "taskId": "task-creator-approval",
+            "owner": "Creator",
+            "reason": "Upload Package remains blocked until the creator accepts the revised episode package."
+          }
+        },
+        "healthSignals": {
+          "schedule": "at_risk",
+          "momentum": "paused",
+          "summary": "The creator requested changes. Mission Control kept Upload Package blocked and preserved the review decision."
+        }
+      },
+      "activity": [
+        { "type": "changes_requested", "actor": "Creator", "message": "Creator requested changes. Upload Package remains blocked at the approval gate." }
+      ],
+      "decision": {
+        "actor": "Creator",
+        "choice": "Request changes before upload packaging",
+        "rationale": "The creator wants the episode package revised before authorizing the external handoff.",
+        "effect": "Kept the approval gate and Upload Package blocker in place."
+      },
+      "toast": "Changes recorded. Upload Package remains blocked."
+    }
+  ],
   "orchestration": {
     "mode": "deterministic_demo",
     "providerStatus": "OpenAI adapter deferred until a key is added",

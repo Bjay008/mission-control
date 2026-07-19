@@ -10,12 +10,22 @@ import {
   validateOrchestrationData
 } from "../app/orchestration-engine.js";
 import {
+  applyMissionAction,
   cloneMissionState,
+  listAvailableActions,
   recalculateMissionHealth,
   validateMissionData
 } from "../app/mission-engine.js";
 
 const source = JSON.parse(await readFile(new URL("../data/episode-pipeline.json", import.meta.url), "utf8"));
+
+function advanceThroughQc(input) {
+  let state = startEpisodeRun(input, { timestamp: "2026-07-19T09:00:00.000Z" });
+  for (let step = 1; step <= 9; step += 1) {
+    state = advanceEpisodeRun(state, { timestamp: `2026-07-19T09:00:${String(step).padStart(2, "0")}.000Z` });
+  }
+  return state;
+}
 
 test("the frozen CEO-to-upload pipeline is valid and starts idle", () => {
   assert.equal(validateMissionData(source), true);
@@ -24,6 +34,7 @@ test("the frozen CEO-to-upload pipeline is valid and starts idle", () => {
   assert.equal(initial.orchestration.status, "idle");
   assert.equal(initial.mission.progress, 0);
   assert.equal(initial.orchestration.stages.length, 10);
+  assert.equal(initial.tasks.find((task) => task.id === "task-creator-approval").progressWeight, 0);
   assert.equal(initial.tasks.reduce((sum, task) => sum + task.progressWeight, 0), 100);
 });
 
@@ -56,6 +67,43 @@ test("each advance completes one stage, creates its artifact, and routes the nex
   assert.equal(advanced.orchestration.currentStageId, "research");
   assert.equal(advanced.artifacts[0].filename, "episode-plan.json");
   assert.equal(advanced.mission.progress, 6);
+});
+
+test("QC pauses execution at a visible human approval gate", () => {
+  const paused = advanceThroughQc(source);
+
+  assert.equal(paused.orchestration.status, "awaiting_approval");
+  assert.equal(paused.tasks.find((task) => task.id === "task-qc").state, "complete");
+  assert.equal(paused.tasks.find((task) => task.id === "task-creator-approval").state, "awaiting_human");
+  assert.equal(paused.tasks.find((task) => task.id === "task-upload-package").state, "pending");
+  assert.equal(paused.artifacts.some((artifact) => artifact.type === "upload_manifest"), false);
+  assert.equal(paused.mission.progress, 86);
+  assert.equal(paused.mission.humanRequired, true);
+  assert.equal(paused.blockers[0].title, "Awaiting creator approval");
+  assert.equal(paused.mission.nextRecommendedAction.label, "Review and approve the episode package");
+  assert.match(paused.mission.nextRecommendedAction.reason, /Final creator approval is required/);
+  assert.deepEqual(listAvailableActions(paused).sort(), ["approve", "request_changes"]);
+  assert.throws(() => advanceEpisodeRun(paused), /not running/);
+});
+
+test("creator approval is recorded and resumes Upload Package", () => {
+  const paused = advanceThroughQc(source);
+  const approved = applyMissionAction(paused, "approve", { timestamp: "2026-07-19T09:00:10.000Z" }).state;
+
+  assert.equal(approved.orchestration.status, "running");
+  assert.equal(approved.orchestration.currentStageId, "upload-package");
+  assert.equal(approved.tasks.find((task) => task.id === "task-creator-approval").state, "complete");
+  assert.equal(approved.tasks.find((task) => task.id === "task-upload-package").state, "active");
+  assert.equal(approved.mission.humanRequired, false);
+  assert.equal(approved.blockers.length, 0);
+  assert.equal(approved.decisions[0].choice, "Approve the episode package");
+  assert.equal(approved.recentActivity[0].type, "approval_granted");
+
+  const completed = advanceEpisodeRun(approved, { timestamp: "2026-07-19T09:00:11.000Z" });
+  assert.equal(completed.orchestration.status, "ready");
+  assert.equal(completed.mission.currentStage, "Ready for YouTube");
+  assert.equal(completed.mission.progress, 100);
+  assert.equal(completed.artifacts.at(-1).filename, "upload-package.json");
 });
 
 test("one deterministic run produces every artifact and stops before external upload", () => {

@@ -5,6 +5,7 @@ import { join } from "node:path";
 
 const edgePath = "C:\\Program Files (x86)\\Microsoft\\Edge\\Application\\msedge.exe";
 const debugPort = 9334;
+const dashboardUrl = process.env.DASHBOARD_URL ?? "http://127.0.0.1:4173/";
 const profileDirectory = await mkdtemp(join(tmpdir(), "mission-control-orchestration-"));
 const browser = spawn(edgePath, [
   "--headless=new",
@@ -93,7 +94,7 @@ try {
   await send("Page.enable");
   await send("Runtime.enable");
   await send("Emulation.setDeviceMetricsOverride", { width: 1440, height: 1000, deviceScaleFactor: 1, mobile: false });
-  await send("Page.navigate", { url: "http://127.0.0.1:4173/" });
+  await send("Page.navigate", { url: dashboardUrl });
   await waitForText("#create-episode-label", "Create Episode");
   await waitForText("#health-label", "On track");
 
@@ -110,6 +111,30 @@ try {
   if (initial.command !== "Create Day 32.") throw new Error(`Expected the judged Day 32 command, received ${initial.command}.`);
 
   await evaluate("document.querySelector('#create-episode-button').click()");
+  await waitForText("#create-episode-label", "Awaiting Approval");
+
+  const paused = await evaluate(`({
+    progress: document.querySelector('#progress-value').textContent.trim(),
+    currentStage: [...document.querySelectorAll('#signal-grid dd')][0].textContent.trim(),
+    completeStages: document.querySelectorAll('.pipeline-step.complete').length,
+    uploadState: document.querySelectorAll('.pipeline-step')[9].className,
+    blocker: document.querySelector('#blocker-title').textContent.trim(),
+    nextAction: document.querySelector('#next-action-label').textContent.trim(),
+    humanNeeded: document.querySelector('#human-required').textContent.trim(),
+    approvalVisible: !document.querySelector('#approval-actions').hidden,
+    uploadArtifactExists: [...document.querySelectorAll('#activity-list p')].some((node) => node.textContent.includes('upload-package.json'))
+  })`);
+  if (paused.progress !== "86%") throw new Error(`Expected 86% progress at approval, received ${paused.progress}.`);
+  if (paused.currentStage !== "Creator approval") throw new Error(`Expected Creator approval stage, received ${paused.currentStage}.`);
+  if (paused.completeStages !== 9) throw new Error(`Expected 9 completed stages before approval, received ${paused.completeStages}.`);
+  if (!paused.uploadState.includes("pending")) throw new Error(`Upload Package advanced before approval: ${paused.uploadState}.`);
+  if (paused.blocker !== "Awaiting creator approval") throw new Error(`Unexpected blocker: ${paused.blocker}.`);
+  if (paused.nextAction !== "Review and approve the episode package") throw new Error(`Unexpected next action: ${paused.nextAction}.`);
+  if (!paused.humanNeeded.startsWith("Yes")) throw new Error(`Human approval was not visible: ${paused.humanNeeded}.`);
+  if (!paused.approvalVisible) throw new Error("Approval controls are hidden at the creator checkpoint.");
+  if (paused.uploadArtifactExists) throw new Error("Upload Package completed before creator approval.");
+
+  await evaluate("document.querySelector('#approve-button').click()");
   await waitForText("#create-episode-label", "Create Another Episode");
 
   const completed = await evaluate(`({
@@ -119,7 +144,9 @@ try {
     ready: document.querySelector('#ready-panel h3').textContent.trim(),
     artifact: document.querySelector('#ready-artifact-name').textContent.trim(),
     mission: document.querySelector('#mission-name').textContent.trim(),
-    saved: Boolean(localStorage.getItem('mission-control:episode-pipeline:v1'))
+    saved: Boolean(localStorage.getItem('mission-control:episode-pipeline:v1')),
+    approvalDecision: [...document.querySelectorAll('#decision-list h3')].some((node) => node.textContent.trim() === 'Approve the episode package'),
+    approvalActivity: [...document.querySelectorAll('#activity-list p')].some((node) => node.textContent.includes('Creator approved the episode package'))
   })`);
   if (completed.progress !== "100%") throw new Error(`Expected 100% progress, received ${completed.progress}.`);
   if (completed.completeStages !== 10) throw new Error(`Expected 10 completed stages, received ${completed.completeStages}.`);
@@ -127,9 +154,16 @@ try {
   if (completed.artifact !== "upload-package.json") throw new Error(`Unexpected final artifact: ${completed.artifact}.`);
   if (completed.mission !== "Bible in 365 Days — Day 32") throw new Error(`Unexpected mission name: ${completed.mission}.`);
   if (!completed.saved) throw new Error("Completed run was not persisted.");
+  if (!completed.approvalDecision) throw new Error("Creator approval is missing from the decision log.");
+  if (!completed.approvalActivity) throw new Error("Creator approval is missing from recent activity.");
 
   await send("Page.reload", { ignoreCache: true });
   await waitForText("#create-episode-label", "Create Another Episode");
+  const persistedApproval = await evaluate(`
+    [...document.querySelectorAll('#decision-list h3')].some((node) => node.textContent.trim() === 'Approve the episode package')
+    && [...document.querySelectorAll('#activity-list p')].some((node) => node.textContent.includes('Creator approved the episode package'))
+  `);
+  if (!persistedApproval) throw new Error("Creator approval did not persist after refresh.");
 
   await evaluate("document.querySelector('#reset-button').click()");
   await waitForText("#create-episode-label", "Create Episode");
@@ -143,8 +177,9 @@ try {
 
   console.log(JSON.stringify({
     initial,
+    paused,
     completed,
-    persistedAfterRefresh: true,
+    persistedAfterRefresh: persistedApproval,
     resetClearedStorage,
     mobileOverflow,
     browserErrors: browserErrors.length

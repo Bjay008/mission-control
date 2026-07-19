@@ -1,6 +1,8 @@
-import { cloneMissionState, recalculateMissionHealth } from "./mission-engine.js";
+import { applyMissionAction, cloneMissionState, recalculateMissionHealth } from "./mission-engine.js";
 
-const VALID_RUN_STATUSES = new Set(["idle", "running", "ready"]);
+const VALID_RUN_STATUSES = new Set(["idle", "running", "awaiting_approval", "ready"]);
+const CREATOR_APPROVAL_TASK_ID = "task-creator-approval";
+const CREATOR_APPROVAL_BLOCKER_ID = "blocker-creator-approval";
 
 function assert(condition, message) {
   if (!condition) throw new Error(message);
@@ -133,6 +135,45 @@ export function startEpisodeRun(input, options = {}) {
   return recalculateMissionHealth(state);
 }
 
+function pauseForCreatorApproval(state, timestamp) {
+  const approvalTask = taskById(state, CREATOR_APPROVAL_TASK_ID);
+  assert(approvalTask, `Mission data requires ${CREATOR_APPROVAL_TASK_ID}.`);
+
+  approvalTask.state = "awaiting_human";
+  approvalTask.nextAction = "Review the QC report and approve or request changes.";
+  state.orchestration.status = "awaiting_approval";
+  state.orchestration.currentStageId = null;
+  state.mission.currentStage = "Creator approval";
+  state.mission.humanRequired = true;
+  state.mission.nextRecommendedAction = {
+    label: "Review and approve the episode package",
+    taskId: CREATOR_APPROVAL_TASK_ID,
+    owner: "Creator",
+    reason: "Final creator approval is required before preparing the external upload package."
+  };
+  state.blockers = [{
+    id: CREATOR_APPROVAL_BLOCKER_ID,
+    title: "Awaiting creator approval",
+    severity: "medium",
+    affectedTaskId: "task-upload-package",
+    cause: "QC is complete, but Mission Control will not prepare the external upload handoff without human judgment.",
+    owner: "Creator",
+    resolution: "Review and approve the episode package."
+  }];
+  state.healthSignals.schedule = "at_risk";
+  state.healthSignals.momentum = "paused";
+  state.healthSignals.summary = "QC passed. Mission Control paused before Upload Package because final creator judgment is required.";
+  state.recentActivity = [{
+    id: recordId("activity", timestamp, "creator-approval-requested"),
+    timestamp,
+    type: "approval_requested",
+    actor: "Mission Control",
+    message: "QC passed. Execution paused before Upload Package and requested final creator approval."
+  }, ...(state.recentActivity ?? [])];
+
+  return recalculateMissionHealth(state);
+}
+
 export function advanceEpisodeRun(input, options = {}) {
   validateOrchestrationData(input);
   assert(input.orchestration.status === "running", "The episode pipeline is not running.");
@@ -161,6 +202,10 @@ export function advanceEpisodeRun(input, options = {}) {
     message: `${stage.label} completed and produced ${artifact.filename}.`
   }, ...(state.recentActivity ?? [])];
   state.mission.updatedAt = timestamp;
+
+  if (stage.id === "qc") {
+    return pauseForCreatorApproval(state, timestamp);
+  }
 
   if (nextStage) {
     const nextTask = taskById(state, nextStage.taskId);
@@ -205,11 +250,14 @@ export function advanceEpisodeRun(input, options = {}) {
 export function runEpisodeToCompletion(input, options = {}) {
   let state = startEpisodeRun(input, { timestamp: options.startedAt ?? "2026-07-19T09:00:00.000Z" });
   let step = 0;
-  while (state.orchestration.status === "running") {
+  while (state.orchestration.status !== "ready") {
     step += 1;
-    state = advanceEpisodeRun(state, {
-      timestamp: options.timestampForStep?.(step) ?? new Date(Date.parse(state.orchestration.startedAt) + step * 1000).toISOString()
-    });
+    const timestamp = options.timestampForStep?.(step) ?? new Date(Date.parse(state.orchestration.startedAt) + step * 1000).toISOString();
+    if (state.orchestration.status === "awaiting_approval") {
+      state = applyMissionAction(state, "approve", { timestamp }).state;
+    } else {
+      state = advanceEpisodeRun(state, { timestamp });
+    }
   }
   return state;
 }

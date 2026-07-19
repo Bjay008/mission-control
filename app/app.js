@@ -135,21 +135,27 @@ function delay(milliseconds) {
 function renderOrchestration() {
   const { orchestration } = state;
   const isRunning = orchestration.status === "running";
+  const isAwaitingApproval = orchestration.status === "awaiting_approval";
   const isReady = orchestration.status === "ready";
+  const isBusy = isRunning || isAwaitingApproval;
   const currentStage = orchestration.stages.find((stage) => stage.id === orchestration.currentStageId);
 
   elements.providerStatus.textContent = orchestration.providerStatus;
-  elements.createEpisodeButton.disabled = isRunning;
-  elements.missionCommand.disabled = isRunning;
-  elements.createEpisodeButton.classList.toggle("is-running", isRunning);
+  elements.createEpisodeButton.disabled = isBusy;
+  elements.missionCommand.disabled = isBusy;
+  elements.createEpisodeButton.classList.toggle("is-running", isBusy);
   elements.createEpisodeLabel.textContent = isRunning
     ? `${currentStage?.label ?? "Pipeline"} working…`
-    : isReady
+    : isAwaitingApproval
+      ? "Awaiting Approval"
+      : isReady
       ? "Create Another Episode"
       : "Create Episode";
   elements.runStatus.textContent = isRunning
     ? `${currentStage?.label ?? "Pipeline"} is active. CEO Brain will route the accepted artifact automatically.`
-    : isReady
+    : isAwaitingApproval
+      ? "QC passed. Upload Package is blocked until the creator approves the episode."
+      : isReady
       ? "All ten production stages completed successfully."
       : "Ready for one-command execution.";
 
@@ -342,6 +348,9 @@ function runAction(action) {
     render();
     showToast(result.transition.toast);
     elements.nextActionCard.scrollIntoView({ behavior: "smooth", block: "center" });
+    if (state.orchestration.status === "running") {
+      continueEpisodeRun(++runToken);
+    }
   } catch (error) {
     showToast(error.message);
   }
@@ -360,6 +369,9 @@ async function continueEpisodeRun(token) {
   if (token === runToken && state.orchestration.status === "ready") {
     showToast(`Day ${state.orchestration.episodeDay} complete. Upload package is Ready for YouTube.`);
     elements.readyPanel.scrollIntoView({ behavior: "smooth", block: "center" });
+  } else if (token === runToken && state.orchestration.status === "awaiting_approval") {
+    showToast("QC passed. Creator approval is required before Upload Package.");
+    elements.nextActionCard.scrollIntoView({ behavior: "smooth", block: "center" });
   }
 }
 

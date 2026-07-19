@@ -1,14 +1,22 @@
 # Three-Minute Demo Script
 
-## Winning path — one command (0:00–1:20)
+## Demo goal
 
-Open Mission Control at the **Create Episode** panel.
+Show one complete governance loop: deterministic agents and tools execute the work they can, Mission Control pauses where human judgment matters, records the creator's decision, and continues without losing mission context.
 
-Say: “A creator gives one command. CEO Brain owns the critical path and routes every accepted output to the next specialist.”
+## Scene 1 — One mission (0:00–0:30)
 
-Select **Create Episode** once. Do not click anything else while the pipeline runs.
+Open Mission Control at the **Create Episode** panel with the command:
 
-Point to the live sequence as each stage completes:
+> Create Day 32.
+
+Say: “AI can generate content. The hard part is governing a long-running mission across agents, tools, and people.”
+
+Select **Create Episode** once.
+
+## Scene 2 — Governed orchestration (0:30–1:10)
+
+Point to the live sequence as the deterministic pipeline completes:
 
 1. CEO
 2. Research
@@ -19,84 +27,54 @@ Point to the live sequence as each stage completes:
 7. Thumbnail
 8. SEO
 9. QC
-10. Upload Package
 
-When the final panel appears, say: “Every stage produced an inspectable contract. QC accepted the package, and Mission Control stopped before the creator-controlled YouTube action.”
+Say: “Every stage has a named executor, a routing reason, and an inspectable output contract. Mission Control keeps the critical path moving without pretending external providers ran.”
 
-The demo-mode label must remain visible. Do not claim OpenAI, voice synthesis, image generation, or YouTube publishing ran live until those adapters are configured.
+## Scene 3 — Creator approval checkpoint (1:10–2:00)
 
-## Demo goal
+After QC, show that execution pauses before **Upload Package**:
 
-Show one complete governance loop: a mission is at risk, Mission Control explains why, a human makes the required decision, and execution continues with improved mission health.
+- progress is 86%
+- health is **At risk**
+- current stage is **Creator approval**
+- human needed is **Yes**
+- blocker is **Awaiting creator approval**
+- recommended next action is **Review and approve the episode package**
+- Upload Package remains pending
+- the Creator appears as the human executor
 
-## Scene 1 — The mission (0:00–0:25)
+Open the Creator approval task and point to the routing reason:
 
-Open the mission:
+> Final creator approval is required before preparing the external upload package.
 
-> Publish one high-quality Bible in 365 Days episode every day.
+Say: “Mission Control knows where automation must stop. Human judgment is a first-class part of the workflow, not an exception hidden in chat.”
 
-Say: “AI can generate content. The hard part is keeping a long-running mission moving across agents, tools, and people.”
+Select **Approve & continue**.
 
-## Scene 2 — Mission health (0:25–0:55)
+## Scene 4 — Continuation and mission memory (2:00–2:35)
 
-Show the health panel:
+Show these visible changes:
 
-- Health: At risk
-- Confidence: 72%
-- Progress: 38%
-- Current stage: Day 1 production
-- Blocker: Thumbnail generation failed
-- Human needed: Yes
-- Recommended next action: Review thumbnail brief
+- the blocker clears
+- human needed becomes **No**
+- Upload Package activates and completes
+- progress reaches 100%
+- the mission reaches **Ready for YouTube**
+- the activity log records creator approval
+- the decision log explains what the approval authorized
 
-Say: “In five seconds I can see whether we are on track, what is blocked, and what must happen next.”
+Say: “Approval is not a dead end. It becomes mission memory, unblocks the next executor, and updates the next move.”
 
-## Scene 3 — Capability-aware routing (0:55–1:30)
+## Close (2:35–3:00)
 
-Show the task list:
-
-- Scripture research → AI agent
-- Script drafting → AI agent
-- Thumbnail generation → connected image tool
-- Theological and quality review → human approval
-- YouTube publishing → connected tool after human approval
-
-For each task, expose executor, status, routing reason, and next action.
-
-Say: “Mission Control does not pretend AI can do everything. It routes the right work to the right executor and explains why.”
-
-## Scene 4 — Human checkpoint (1:30–2:05)
-
-Open the blocked thumbnail task. Show the failed generation, revised brief, and two actions: approve or request changes.
-
-Approve the revised brief.
-
-Say: “High-impact or judgment-heavy work pauses here. The human stays in control.”
-
-## Scene 5 — Continuation (2:05–2:40)
-
-After approval, show these visible changes:
-
-- the approval gate becomes complete
-- thumbnail generation becomes active and then complete
-- the next eligible task becomes active
-- health changes from `at_risk` to `on_track`
-- confidence rises from 72% to 86%
-- the activity log records the decision
-- the dashboard recommends the next action
-
-Say: “The approval is not a dead end. It becomes part of mission memory, unblocks execution, and updates what should happen next.”
-
-## Close (2:40–3:00)
-
-Zoom out to the complete mission dashboard.
+Zoom out to the complete Mission Health dashboard.
 
 Say: “This is not another AI chat. It is Mission Control for work that must actually get finished. Every mission deserves Mission Control.”
 
 ## Demo safety
 
-- Use deterministic demo data and a local state transition.
+- Use deterministic demo data and local state transitions.
 - Reset the mission before each rehearsal.
 - Keep a screen recording as backup.
-- Do not depend on live generation or publishing during the judged demo.
-
+- Do not claim OpenAI, voice synthesis, image generation, YouTube publishing, or any other external provider ran live.
+- The final product boundary is **Ready for YouTube**.
