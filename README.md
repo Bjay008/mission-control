@@ -25,6 +25,12 @@ Mission Control provides:
 
 Bible in 365 Days demonstrates the system through a real content-production mission involving research, scripting, devotional writing, voiceover preparation, visual planning, thumbnails, SEO, quality control, and publishing.
 
+## The memorable demo
+
+> **Create Day 32.**
+
+Select **Create Episode** once. CEO Brain assembles the specialist company and routes the episode through Research, Script, Devotional, Voice, Visual, Thumbnail, SEO, QC, and Upload Package. The run finishes at **Ready for YouTube** without performing the creator-controlled external upload.
+
 ## Core principle
 
 **The right work goes to the right executor at the right time.**
@@ -38,6 +44,10 @@ Bible in 365 Days demonstrates the system through a real content-production miss
 - [Locked decisions](docs/DECISIONS.md)
 - [Demo mission data](data/demo-mission.json)
 - [Autonomous episode pipeline](data/episode-pipeline.json)
+- [DevPost submission draft](docs/DEVPOST_SUBMISSION.md)
+- [Demo video script](docs/DEMO_VIDEO_SCRIPT.md)
+- [Launch checklist](docs/LAUNCH_CHECKLIST.md)
+- [Standalone architecture diagram](docs/ARCHITECTURE_DIAGRAM.md)
 
 ## Run the dashboard
 

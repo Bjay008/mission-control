@@ -9,6 +9,7 @@ import {
 } from "/app/mission-engine.js";
 import {
   advanceEpisodeRun,
+  runEpisodeToCompletion,
   startEpisodeRun,
   validateOrchestrationData
 } from "/app/orchestration-engine.js";
@@ -52,6 +53,7 @@ const elements = {
   decisionList: document.querySelector("#decision-list"),
   createEpisodeButton: document.querySelector("#create-episode-button"),
   createEpisodeLabel: document.querySelector("#create-episode-label"),
+  missionCommand: document.querySelector("#mission-command"),
   runStatus: document.querySelector("#run-status"),
   providerStatus: document.querySelector("#provider-status"),
   orchestrationPipeline: document.querySelector("#orchestration-pipeline"),
@@ -138,6 +140,7 @@ function renderOrchestration() {
 
   elements.providerStatus.textContent = orchestration.providerStatus;
   elements.createEpisodeButton.disabled = isRunning;
+  elements.missionCommand.disabled = isRunning;
   elements.createEpisodeButton.classList.toggle("is-running", isRunning);
   elements.createEpisodeLabel.textContent = isRunning
     ? `${currentStage?.label ?? "Pipeline"} working…`
@@ -153,12 +156,14 @@ function renderOrchestration() {
   elements.orchestrationPipeline.innerHTML = orchestration.stages.map((stage, index) => {
     const task = state.tasks.find((candidate) => candidate.id === stage.taskId);
     const artifact = state.artifacts.find((candidate) => candidate.producedByTaskId === stage.taskId);
+    const executor = state.executors.find((candidate) => candidate.id === stage.executorId);
     const taskState = task?.state ?? "pending";
+    const stageDetail = artifact?.filename ?? (taskState === "active" ? `${executor?.name ?? "Specialist"} · working` : executor?.name ?? stage.purpose);
     return `
       <li class="pipeline-step ${escapeHtml(taskState)}">
         <span class="pipeline-index" aria-hidden="true">${taskState === "complete" ? "✓" : index + 1}</span>
         <div class="pipeline-copy"><strong>${escapeHtml(stage.label)}</strong><span>${escapeHtml(humanize(taskState))}</span></div>
-        <small>${escapeHtml(artifact?.filename ?? stage.purpose)}</small>
+        <small>${escapeHtml(stageDetail)}</small>
       </li>
     `;
   }).join("");
@@ -342,29 +347,35 @@ function runAction(action) {
   }
 }
 
+async function continueEpisodeRun(token) {
+  while (state.orchestration.status === "running" && token === runToken) {
+    const currentStage = state.orchestration.stages.find((stage) => stage.id === state.orchestration.currentStageId);
+    await delay(currentStage?.demoDurationMs ?? 450);
+    if (token !== runToken) return;
+    state = advanceEpisodeRun(state, { timestamp: nowIso() });
+    persistState();
+    render();
+  }
+
+  if (token === runToken && state.orchestration.status === "ready") {
+    showToast(`Day ${state.orchestration.episodeDay} complete. Upload package is Ready for YouTube.`);
+    elements.readyPanel.scrollIntoView({ behavior: "smooth", block: "center" });
+  }
+}
+
 async function createEpisode() {
   const token = ++runToken;
   try {
-    state = startEpisodeRun(originalState, { timestamp: nowIso() });
+    state = startEpisodeRun(originalState, { timestamp: nowIso(), command: elements.missionCommand.value });
+    elements.missionCommand.value = state.orchestration.command;
     persistState();
     render();
-    showToast("Create Episode accepted. CEO Brain is orchestrating the pipeline.");
-
-    while (state.orchestration.status === "running" && token === runToken) {
-      const currentStage = state.orchestration.stages.find((stage) => stage.id === state.orchestration.currentStageId);
-      await delay(currentStage?.demoDurationMs ?? 450);
-      if (token !== runToken) return;
-      state = advanceEpisodeRun(state, { timestamp: nowIso() });
-      persistState();
-      render();
-    }
-
-    if (token === runToken && state.orchestration.status === "ready") {
-      showToast("Episode complete. Upload package is Ready for YouTube.");
-      elements.readyPanel.scrollIntoView({ behavior: "smooth", block: "center" });
-    }
+    showToast(`${state.orchestration.command} accepted. CEO Brain assembled the company.`);
+    await continueEpisodeRun(token);
   } catch (error) {
     showToast(error.message);
+    elements.missionCommand.focus();
+    elements.missionCommand.select();
   }
 }
 
@@ -372,6 +383,7 @@ function resetDemo() {
   if (!originalState) return;
   runToken += 1;
   state = cloneMissionState(originalState);
+  elements.missionCommand.value = state.orchestration.defaultCommand;
   localStorage.removeItem(STORAGE_KEY);
   render();
   showToast("Demo reset to the source mission state.");
@@ -386,11 +398,18 @@ async function loadMission() {
     validateOrchestrationData(data);
 
     originalState = recalculateMissionHealth(data);
-    state = restoreMissionState(data, localStorage.getItem(STORAGE_KEY)) ?? cloneMissionState(originalState);
+    const previewMode = new URLSearchParams(window.location.search).get("preview");
+    state = previewMode === "ready"
+      ? runEpisodeToCompletion(data)
+      : restoreMissionState(data, localStorage.getItem(STORAGE_KEY)) ?? cloneMissionState(originalState);
     validateOrchestrationData(state);
+    elements.missionCommand.value = state.orchestration.command ?? state.orchestration.defaultCommand;
     render();
     elements.loading.hidden = true;
     elements.dashboard.hidden = false;
+    if (state.orchestration.status === "running") {
+      continueEpisodeRun(++runToken);
+    }
   } catch (error) {
     elements.loading.hidden = true;
     elements.error.hidden = false;

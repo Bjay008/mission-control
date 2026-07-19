@@ -23,7 +23,7 @@ function stageByTaskId(state, taskId) {
   return state.orchestration.stages.find((stage) => stage.taskId === taskId);
 }
 
-function createArtifact(stage, timestamp) {
+function createArtifact(stage, timestamp, episodeDay) {
   return {
     id: `artifact-${stage.id}`,
     name: stage.artifact.name,
@@ -33,9 +33,19 @@ function createArtifact(stage, timestamp) {
     producedByTaskId: stage.taskId,
     reviewState: "accepted_for_demo",
     version: 1,
+    episodeDay,
     createdAt: timestamp,
-    uri: `demo://artifacts/${stage.artifact.filename}`
+    uri: `demo://artifacts/day-${episodeDay}/${stage.artifact.filename}`
   };
+}
+
+export function parseEpisodeCommand(input) {
+  const command = String(input ?? "").trim();
+  const match = command.match(/^create\s+day\s+(\d{1,3})\.?$/i);
+  assert(match, "Use the command format: Create Day 32.");
+  const day = Number(match[1]);
+  assert(day >= 1 && day <= 365, "Episode day must be between 1 and 365.");
+  return { day, command: `Create Day ${day}.` };
 }
 
 export function validateOrchestrationData(input) {
@@ -72,6 +82,7 @@ export function startEpisodeRun(input, options = {}) {
   validateOrchestrationData(input);
   const state = cloneMissionState(input);
   const timestamp = options.timestamp ?? new Date().toISOString();
+  const parsedCommand = parseEpisodeCommand(options.command ?? state.orchestration.defaultCommand ?? "Create Day 32.");
   const firstStage = state.orchestration.stages[0];
 
   state.tasks = state.tasks.map((task) => ({
@@ -82,6 +93,10 @@ export function startEpisodeRun(input, options = {}) {
   state.artifacts = [];
   state.blockers = [];
   state.orchestration.status = "running";
+  state.orchestration.command = parsedCommand.command;
+  state.orchestration.episodeDay = parsedCommand.day;
+  state.mission.id = `bible-365-day-${String(parsedCommand.day).padStart(3, "0")}`;
+  state.mission.name = `Bible in 365 Days — Day ${parsedCommand.day}`;
   state.orchestration.runId = recordId("episode-run", timestamp, state.mission.id);
   state.orchestration.startedAt = timestamp;
   state.orchestration.completedAt = null;
@@ -104,7 +119,7 @@ export function startEpisodeRun(input, options = {}) {
     timestamp,
     type: "orchestration_started",
     actor: "CEO Brain",
-    message: "Create Episode command accepted. The autonomous production pipeline is running."
+    message: `${parsedCommand.command} accepted. The AI company organized the frozen production team and started execution.`
   }, ...(state.recentActivity ?? [])];
   state.decisions = [{
     id: recordId("decision", timestamp, "execution-plan"),
@@ -132,7 +147,7 @@ export function advanceEpisodeRun(input, options = {}) {
 
   activeTask.state = "complete";
   activeTask.nextAction = "Stage contract completed.";
-  const artifact = createArtifact(stage, timestamp);
+  const artifact = createArtifact(stage, timestamp, state.orchestration.episodeDay);
   state.artifacts = [...(state.artifacts ?? []).filter((candidate) => candidate.id !== artifact.id), artifact];
 
   const stageIndex = state.orchestration.stages.findIndex((candidate) => candidate.id === stage.id);

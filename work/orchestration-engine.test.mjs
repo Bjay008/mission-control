@@ -4,6 +4,7 @@ import test from "node:test";
 
 import {
   advanceEpisodeRun,
+  parseEpisodeCommand,
   runEpisodeToCompletion,
   startEpisodeRun,
   validateOrchestrationData
@@ -26,12 +27,21 @@ test("the frozen CEO-to-upload pipeline is valid and starts idle", () => {
   assert.equal(initial.tasks.reduce((sum, task) => sum + task.progressWeight, 0), 100);
 });
 
+test("the judged command resolves Day 32 and rejects invalid days", () => {
+  assert.deepEqual(parseEpisodeCommand("Create Day 32."), { day: 32, command: "Create Day 32." });
+  assert.deepEqual(parseEpisodeCommand(" create day 7 "), { day: 7, command: "Create Day 7." });
+  assert.throws(() => parseEpisodeCommand("Create an episode"), /Create Day 32/);
+  assert.throws(() => parseEpisodeCommand("Create Day 366"), /between 1 and 365/);
+});
+
 test("Create Episode activates CEO Brain without mutating the source", () => {
   const before = cloneMissionState(source);
-  const running = startEpisodeRun(source, { timestamp: "2026-07-19T09:00:00.000Z" });
+  const running = startEpisodeRun(source, { timestamp: "2026-07-19T09:00:00.000Z", command: "Create Day 32." });
 
   assert.equal(running.orchestration.status, "running");
   assert.equal(running.orchestration.currentStageId, "ceo");
+  assert.equal(running.orchestration.episodeDay, 32);
+  assert.equal(running.mission.name, "Bible in 365 Days — Day 32");
   assert.equal(running.tasks.find((task) => task.id === "task-ceo").state, "active");
   assert.equal(running.tasks.filter((task) => task.state === "active").length, 1);
   assert.deepEqual(source, before);

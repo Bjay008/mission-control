@@ -29,6 +29,32 @@ Rule: nothing gets added unless it helps win.
 - [x] Clear completed-stage and final Ready for YouTube states
 - [x] Responsive presentation and deterministic reset
 
+### Sprint 3 — Wow factor
+
+- [x] Demo opens with `Create Day 32.`
+- [x] Command is validated and becomes the Day 32 mission identity
+- [x] Audience sees the ten-specialist AI company organize and execute
+- [x] Complete episode contract reaches Ready for YouTube within moments
+
+### Sprint 4 — Polish and reliability
+
+- [x] Invalid commands fail before state mutation
+- [x] Mid-run refresh resumes execution
+- [x] UI copy clearly separates demo adapters from live providers
+- [x] Engine and browser verification cover the judged path
+- [x] Mobile layout and browser console remain clean
+
+### Sprint 5 — Launch
+
+- [x] README polished around the Day 32 story
+- [x] Architecture diagram prepared
+- [x] DevPost submission drafted
+- [x] Demo-video script and shot list prepared
+- [x] GitHub repository maintained as the submission source
+- [ ] Capture final screenshots
+- [ ] Record and export final demo video
+- [ ] Submit DevPost entry
+
 ### Deferred deliberately
 
 - OpenAI API key and live model adapter

@@ -4,7 +4,7 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 
 const edgePath = "C:\\Program Files (x86)\\Microsoft\\Edge\\Application\\msedge.exe";
-const debugPort = 9333;
+const debugPort = 9334;
 const profileDirectory = await mkdtemp(join(tmpdir(), "mission-control-orchestration-"));
 const browser = spawn(edgePath, [
   "--headless=new",
@@ -92,6 +92,7 @@ try {
   await connectToPage();
   await send("Page.enable");
   await send("Runtime.enable");
+  await send("Emulation.setDeviceMetricsOverride", { width: 1440, height: 1000, deviceScaleFactor: 1, mobile: false });
   await send("Page.navigate", { url: "http://127.0.0.1:4173/" });
   await waitForText("#create-episode-label", "Create Episode");
   await waitForText("#health-label", "On track");
@@ -100,11 +101,13 @@ try {
     health: document.querySelector('#health-label').textContent.trim(),
     progress: document.querySelector('#progress-value').textContent.trim(),
     stages: document.querySelectorAll('.pipeline-step').length,
-    mode: document.querySelector('#provider-status').textContent.trim()
+    mode: document.querySelector('#provider-status').textContent.trim(),
+    command: document.querySelector('#mission-command').value
   })`);
   if (initial.health !== "On track") throw new Error(`Expected On track health, received ${initial.health}.`);
   if (initial.progress !== "0%") throw new Error(`Expected 0% progress, received ${initial.progress}.`);
   if (initial.stages !== 10) throw new Error(`Expected 10 pipeline stages, received ${initial.stages}.`);
+  if (initial.command !== "Create Day 32.") throw new Error(`Expected the judged Day 32 command, received ${initial.command}.`);
 
   await evaluate("document.querySelector('#create-episode-button').click()");
   await waitForText("#create-episode-label", "Create Another Episode");
@@ -115,12 +118,14 @@ try {
     completeStages: document.querySelectorAll('.pipeline-step.complete').length,
     ready: document.querySelector('#ready-panel h3').textContent.trim(),
     artifact: document.querySelector('#ready-artifact-name').textContent.trim(),
+    mission: document.querySelector('#mission-name').textContent.trim(),
     saved: Boolean(localStorage.getItem('mission-control:episode-pipeline:v1'))
   })`);
   if (completed.progress !== "100%") throw new Error(`Expected 100% progress, received ${completed.progress}.`);
   if (completed.completeStages !== 10) throw new Error(`Expected 10 completed stages, received ${completed.completeStages}.`);
   if (completed.ready !== "Ready for YouTube") throw new Error(`Expected Ready for YouTube, received ${completed.ready}.`);
   if (completed.artifact !== "upload-package.json") throw new Error(`Unexpected final artifact: ${completed.artifact}.`);
+  if (completed.mission !== "Bible in 365 Days — Day 32") throw new Error(`Unexpected mission name: ${completed.mission}.`);
   if (!completed.saved) throw new Error("Completed run was not persisted.");
 
   await send("Page.reload", { ignoreCache: true });
@@ -136,7 +141,14 @@ try {
   if (mobileOverflow) throw new Error("Mobile layout has horizontal overflow.");
   if (browserErrors.length) throw new Error(`Browser errors: ${browserErrors.join(" | ")}`);
 
-  console.log(JSON.stringify({ initial, completed, persistedAfterRefresh: true, resetClearedStorage, mobileOverflow, browserErrors: browserErrors.length }, null, 2));
+  console.log(JSON.stringify({
+    initial,
+    completed,
+    persistedAfterRefresh: true,
+    resetClearedStorage,
+    mobileOverflow,
+    browserErrors: browserErrors.length
+  }, null, 2));
 } finally {
   socket?.close();
   if (browser.exitCode === null) {

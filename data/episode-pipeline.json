@@ -84,6 +84,9 @@
   "orchestration": {
     "mode": "deterministic_demo",
     "providerStatus": "OpenAI adapter deferred until a key is added",
+    "defaultCommand": "Create Day 32.",
+    "command": "Create Day 32.",
+    "episodeDay": 32,
     "status": "idle",
     "runId": null,
     "startedAt": null,

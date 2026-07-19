@@ -39,12 +39,14 @@
             <div class="launch-copy">
               <div class="launch-kicker"><span class="live-dot" aria-hidden="true"></span>CEO Brain · autonomous orchestration</div>
               <h2 id="episode-run-heading">One command. Entire episode workflow.</h2>
-              <p>CEO Brain routes accepted outputs from research through quality control, then assembles a creator-controlled YouTube upload package.</p>
-              <div class="launch-meta"><span>Deterministic demo mode</span><span id="provider-status">OpenAI adapter deferred</span></div>
+              <p>Give the AI company one mission. CEO Brain assembles the specialist team, routes every accepted output, and delivers a creator-controlled YouTube upload package.</p>
+              <div class="launch-meta"><span>10 specialists standing by</span><span>Deterministic demo mode</span><span id="provider-status">OpenAI adapter deferred</span></div>
             </div>
             <div class="launch-action">
+              <label for="mission-command">Mission command</label>
+              <div class="command-input"><span aria-hidden="true">›</span><input id="mission-command" name="mission-command" value="Create Day 32." autocomplete="off" spellcheck="false" aria-describedby="command-help"></div>
               <button class="button button-launch" id="create-episode-button" type="button"><span aria-hidden="true">▶</span><span id="create-episode-label">Create Episode</span></button>
-              <p id="run-status" aria-live="polite">Ready for one-command execution.</p>
+              <p id="run-status" aria-live="polite">Ready for one-command execution.</p><span class="sr-only" id="command-help">Enter Create Day followed by a number from 1 to 365.</span>
             </div>
           </article>
 

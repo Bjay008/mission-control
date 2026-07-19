@@ -218,6 +218,12 @@ a { color: inherit; }
 .launch-meta { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 20px; }
 .launch-meta span { padding: 6px 9px; border: 1px solid var(--border); border-radius: 99px; color: var(--text-muted); background: rgba(0,0,0,.1); font-size: .65rem; }
 .launch-action { display: grid; gap: 10px; justify-items: stretch; }
+.launch-action > label { color: var(--text-muted); font-size: .64rem; font-weight: 700; letter-spacing: .09em; text-transform: uppercase; }
+.command-input { display: grid; grid-template-columns: auto 1fr; align-items: center; gap: 9px; min-height: 48px; padding: 0 14px; border: 1px solid rgba(126,200,255,.24); border-radius: 12px; background: rgba(5,15,14,.72); box-shadow: inset 0 0 0 1px rgba(255,255,255,.015); }
+.command-input:focus-within { border-color: rgba(119,230,180,.55); box-shadow: 0 0 0 3px rgba(119,230,180,.07); }
+.command-input > span { color: var(--mint); font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 1.1rem; }
+.command-input input { width: 100%; min-width: 0; border: 0; outline: 0; background: transparent; color: var(--text); font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: .84rem; }
+.command-input input:disabled { color: var(--text-soft); }
 .button-launch { min-height: 58px; justify-content: center; gap: 10px; border-color: transparent; background: linear-gradient(135deg, var(--mint), #50c993); color: #07100f; box-shadow: 0 16px 34px rgba(45,163,111,.23); font-size: .88rem; font-weight: 800; }
 .button-launch:hover { background: linear-gradient(135deg, var(--mint-strong), var(--mint)); transform: translateY(-1px); }
 .button-launch:disabled { cursor: wait; opacity: .88; transform: none; }
@@ -423,6 +429,7 @@ code { color: var(--text-soft); font-family: ui-monospace, SFMono-Regular, Menlo
 
 .toast { position: fixed; right: 28px; bottom: 28px; z-index: 50; max-width: min(360px, calc(100vw - 36px)); padding: 12px 16px; border: 1px solid rgba(119,230,180,.28); border-radius: 11px; background: #18382f; color: var(--mint-strong); box-shadow: 0 18px 48px rgba(0,0,0,.4); font-size: 0.78rem; opacity: 0; transform: translateY(10px); pointer-events: none; transition: 180ms ease; }
 .toast.is-visible { opacity: 1; transform: translateY(0); }
+.sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0; }
 
 [hidden] { display: none !important; }
 
