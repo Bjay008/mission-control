@@ -37,6 +37,7 @@ Bible in 365 Days demonstrates the system through a real content-production miss
 - [Hackathon sprint](docs/HACKATHON_SPRINT.md)
 - [Locked decisions](docs/DECISIONS.md)
 - [Demo mission data](data/demo-mission.json)
+- [Autonomous episode pipeline](data/episode-pipeline.json)
 
 ## Run the dashboard
 
@@ -48,17 +49,20 @@ The dashboard has no external runtime dependencies. From PowerShell in the repos
 
 Then open [http://127.0.0.1:4173](http://127.0.0.1:4173).
 
-The page reads `data/demo-mission.json` directly. Use **Approve & continue** to demonstrate the human handoff and continuation loop, or **Reset demo** to restore the original source state.
+The page reads `data/episode-pipeline.json` directly. Select **Create Episode** once to run the frozen CEO → Research → Script → Devotional → Voice → Visual → Thumbnail → SEO → QC → Upload Package workflow. Use **Reset demo** to restore the original source state.
+
+The current runtime is deliberately deterministic. Voice, thumbnail, and upload stages produce inspectable adapter contracts; they do not claim external media rendering or publishing. The OpenAI adapter and API key are deferred until after the hackathon-critical flow is stable.
 
 ### Dashboard behavior
 
 - summarizes mission health, confidence, progress, stage, schedule, and momentum
 - makes the blocker and recommended next action immediately visible
 - explains task ownership across AI agents, connected tools, and humans
-- pauses at the human thumbnail approval gate
-- applies data-driven approval or revision transitions
-- recalculates mission health from task progress, blockers, schedule risk, and human checkpoints
-- preserves the approval in recent activity and the decision log
+- starts the complete ten-stage production workflow from one command
+- routes one accepted artifact into the next executor automatically
+- recalculates mission health from deterministic task progress and risk signals
+- preserves orchestration decisions and stage completion in mission memory
+- stops at a creator-controlled upload package instead of publishing externally
 - restores compatible saved progress after a browser refresh
 - supports desktop and mobile layouts
 
@@ -76,5 +80,5 @@ npm.cmd run verify:browser
 
 ## Next engineering priority
 
-Add one OpenAI-powered Mission Planner entry point while preserving the deterministic governance and health loop.
+Add the OpenAI adapter and secure API key behind the tested orchestration contract; do not change the frozen UI or deterministic governance rules.
 

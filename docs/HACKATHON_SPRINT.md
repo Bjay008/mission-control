@@ -1,5 +1,42 @@
 # Hackathon Sprint
 
+## Frozen sprint map
+
+### Sprint 0 — Vision freeze ✅
+
+- [x] Decide the product story
+- [x] Decide the demo
+- [x] Freeze the feature list
+- [x] Create the GitHub repository
+- [x] Create the project board
+- [x] Define the MVP only
+
+Rule: nothing gets added unless it helps win.
+
+### Sprint 1 — CEO Brain orchestration
+
+- [x] One command starts the episode run
+- [x] CEO routes the frozen critical path
+- [x] Research → Script → Devotional → Voice → Visual → Thumbnail → SEO → QC → Upload Package
+- [x] Every stage produces an inspectable deterministic artifact contract
+- [x] The final state stops at a creator-controlled upload package
+
+### Sprint 2 — Live interface
+
+- [x] One primary **Create Episode** button
+- [x] Simple, polished, professional launch panel
+- [x] Live stage progress driven by engine state
+- [x] Clear completed-stage and final Ready for YouTube states
+- [x] Responsive presentation and deterministic reset
+
+### Deferred deliberately
+
+- OpenAI API key and live model adapter
+- External voice synthesis
+- External image generation
+- Direct YouTube publishing
+- Any feature outside the frozen judge demo
+
 ## Submission outcome
 
 Ship one polished, reliable demonstration of mission governance using Bible in 365 Days as the proof of concept.

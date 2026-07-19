@@ -1,0 +1,106 @@
+{
+  "schemaVersion": 1,
+  "sourceRevision": "bible-365-autonomous-pipeline-v1",
+  "healthPolicy": {
+    "baseConfidence": 96,
+    "thresholds": [
+      { "minimum": 80, "health": "on_track", "label": "On track" },
+      { "minimum": 50, "health": "at_risk", "label": "At risk" },
+      { "minimum": 0, "health": "off_track", "label": "Off track" }
+    ],
+    "deductions": {
+      "humanApprovalRequired": 5,
+      "activeHumanReview": 4,
+      "riskPenalty": 1,
+      "schedule": { "at_risk": 8, "off_track": 16 },
+      "blockerSeverity": { "low": 2, "medium": 5, "high": 10, "critical": 20 }
+    }
+  },
+  "mission": {
+    "id": "bible-365-autonomous-episode",
+    "name": "Bible in 365 Days — Episode Factory",
+    "objective": "Turn one creator command into a quality-controlled Bible episode upload package.",
+    "successCriteria": [
+      "Every stage receives the accepted upstream artifact",
+      "Every executor produces an inspectable output contract",
+      "QC accepts the complete production manifest",
+      "No external upload occurs without a creator action"
+    ],
+    "health": "on_track",
+    "healthLabel": "On track",
+    "confidence": 96,
+    "progress": 0,
+    "currentStage": "Ready to create",
+    "humanRequired": false,
+    "nextRecommendedAction": {
+      "label": "Create Episode",
+      "taskId": "task-ceo",
+      "owner": "Creator",
+      "reason": "One command starts the frozen CEO-to-upload production workflow."
+    },
+    "updatedAt": "2026-07-19T09:00:00+02:00"
+  },
+  "healthSignals": {
+    "schedule": "on_track",
+    "quality": "guarded",
+    "blockerSeverity": "clear",
+    "momentum": "ready",
+    "summary": "The frozen production pipeline is ready. No external AI, media, or publishing action runs in deterministic demo mode.",
+    "riskPenalty": 0
+  },
+  "blockers": [],
+  "executors": [
+    { "id": "agent-ceo", "type": "ai", "name": "CEO Brain", "capabilities": ["workflow planning", "routing", "mission governance"] },
+    { "id": "agent-research", "type": "ai", "name": "Research Agent", "capabilities": ["passage analysis", "source synthesis"] },
+    { "id": "agent-script", "type": "ai", "name": "Script Agent", "capabilities": ["episode scripting", "structure"] },
+    { "id": "agent-devotional", "type": "ai", "name": "Devotional Agent", "capabilities": ["reflection", "practical application"] },
+    { "id": "adapter-voice", "type": "tool", "name": "Voice Adapter — Demo", "capabilities": ["voice manifest", "narration timing"] },
+    { "id": "agent-visual", "type": "ai", "name": "Visual Director", "capabilities": ["scene planning", "visual continuity"] },
+    { "id": "adapter-thumbnail", "type": "tool", "name": "Thumbnail Adapter — Demo", "capabilities": ["thumbnail specification"] },
+    { "id": "agent-seo", "type": "ai", "name": "SEO Agent", "capabilities": ["title", "description", "keywords"] },
+    { "id": "agent-qc", "type": "ai", "name": "QC Agent", "capabilities": ["contract validation", "quality checks"] },
+    { "id": "tool-packager", "type": "tool", "name": "Upload Packager", "capabilities": ["manifest assembly", "handoff packaging"] }
+  ],
+  "tasks": [
+    { "id": "task-ceo", "title": "Plan and route the episode", "stage": "Orchestration", "state": "pending", "executorId": "agent-ceo", "routingReason": "CEO Brain owns the frozen workflow and chooses the next executor from the approved critical path.", "nextAction": "Wait for Create Episode.", "progressWeight": 6, "dependsOn": [], "artifactIds": [] },
+    { "id": "task-research", "title": "Research the assigned passage", "stage": "Editorial", "state": "pending", "executorId": "agent-research", "routingReason": "Research is a bounded synthesis task with a clear evidence contract.", "nextAction": "Wait for CEO plan.", "progressWeight": 10, "dependsOn": ["task-ceo"], "artifactIds": [] },
+    { "id": "task-script", "title": "Write the episode script", "stage": "Editorial", "state": "pending", "executorId": "agent-script", "routingReason": "The script agent turns accepted research into the production narrative.", "nextAction": "Wait for research notes.", "progressWeight": 14, "dependsOn": ["task-research"], "artifactIds": [] },
+    { "id": "task-devotional", "title": "Create the devotional reflection", "stage": "Editorial", "state": "pending", "executorId": "agent-devotional", "routingReason": "A focused devotional agent converts the script theme into reflection and application.", "nextAction": "Wait for script.", "progressWeight": 8, "dependsOn": ["task-script"], "artifactIds": [] },
+    { "id": "task-voice", "title": "Prepare the voice production manifest", "stage": "Production", "state": "pending", "executorId": "adapter-voice", "routingReason": "The demo adapter produces an inspectable voice contract without claiming external audio rendering.", "nextAction": "Wait for devotional.", "progressWeight": 10, "dependsOn": ["task-devotional"], "artifactIds": [] },
+    { "id": "task-visual", "title": "Design the visual plan", "stage": "Production", "state": "pending", "executorId": "agent-visual", "routingReason": "The visual director maps the narration to scenes and continuity rules.", "nextAction": "Wait for voice timing.", "progressWeight": 8, "dependsOn": ["task-voice"], "artifactIds": [] },
+    { "id": "task-thumbnail", "title": "Prepare the thumbnail specification", "stage": "Production", "state": "pending", "executorId": "adapter-thumbnail", "routingReason": "The demo adapter produces a deterministic creative specification for a future image tool.", "nextAction": "Wait for visual plan.", "progressWeight": 10, "dependsOn": ["task-visual"], "artifactIds": [] },
+    { "id": "task-seo", "title": "Create the YouTube SEO package", "stage": "Distribution", "state": "pending", "executorId": "agent-seo", "routingReason": "SEO metadata is a reversible text artifact derived from the accepted episode narrative.", "nextAction": "Wait for thumbnail direction.", "progressWeight": 8, "dependsOn": ["task-thumbnail"], "artifactIds": [] },
+    { "id": "task-qc", "title": "Run production quality control", "stage": "Governance", "state": "pending", "executorId": "agent-qc", "routingReason": "QC validates every required artifact contract before packaging.", "nextAction": "Wait for SEO package.", "progressWeight": 12, "dependsOn": ["task-seo"], "artifactIds": [] },
+    { "id": "task-upload-package", "title": "Assemble the upload package", "stage": "Distribution", "state": "pending", "executorId": "tool-packager", "routingReason": "The packager performs a deterministic local handoff and never publishes externally.", "nextAction": "Wait for QC acceptance.", "progressWeight": 14, "dependsOn": ["task-qc"], "artifactIds": [] }
+  ],
+  "recentActivity": [
+    { "id": "activity-ready", "timestamp": "2026-07-19T09:00:00+02:00", "type": "pipeline_ready", "actor": "Mission Control", "message": "The frozen ten-stage episode workflow is ready for one-command execution." }
+  ],
+  "decisions": [
+    { "id": "decision-scope-freeze", "timestamp": "2026-07-19T08:55:00+02:00", "actor": "CEO", "choice": "Freeze the hackathon production path", "rationale": "Only the CEO-to-upload workflow and its live interface help prove the winning story.", "effect": "All unrelated features remain outside Sprint 1 and Sprint 2." }
+  ],
+  "artifacts": [],
+  "transitions": [],
+  "orchestration": {
+    "mode": "deterministic_demo",
+    "providerStatus": "OpenAI adapter deferred until a key is added",
+    "status": "idle",
+    "runId": null,
+    "startedAt": null,
+    "completedAt": null,
+    "currentStageId": null,
+    "stages": [
+      { "id": "ceo", "label": "CEO", "taskId": "task-ceo", "executorId": "agent-ceo", "purpose": "Translate the creator command into the frozen execution plan.", "demoDurationMs": 480, "artifact": { "name": "Episode execution plan", "filename": "episode-plan.json", "type": "execution_plan", "summary": "Ordered stages, owners, dependencies, and acceptance rules." } },
+      { "id": "research", "label": "Research", "taskId": "task-research", "executorId": "agent-research", "purpose": "Ground the episode in an inspectable passage research contract.", "demoDurationMs": 520, "artifact": { "name": "Passage research notes", "filename": "research-notes.md", "type": "research_notes", "summary": "Context, themes, cross-references, and source boundaries." } },
+      { "id": "script", "label": "Script", "taskId": "task-script", "executorId": "agent-script", "purpose": "Turn accepted research into a production-ready narrative.", "demoDurationMs": 560, "artifact": { "name": "Episode script", "filename": "episode-script.md", "type": "script", "summary": "Hook, narration, transitions, and closing." } },
+      { "id": "devotional", "label": "Devotional", "taskId": "task-devotional", "executorId": "agent-devotional", "purpose": "Create reflection and practical application from the episode theme.", "demoDurationMs": 440, "artifact": { "name": "Devotional reflection", "filename": "devotional.md", "type": "devotional", "summary": "Reflection, application, and closing prayer prompt." } },
+      { "id": "voice", "label": "Voice", "taskId": "task-voice", "executorId": "adapter-voice", "purpose": "Produce the voiceover contract for a future text-to-speech adapter.", "demoDurationMs": 500, "artifact": { "name": "Voice production manifest", "filename": "voiceover-manifest.json", "type": "voice_manifest", "summary": "Voice profile, pacing, pronunciation, and segment timing." } },
+      { "id": "visual", "label": "Visual", "taskId": "task-visual", "executorId": "agent-visual", "purpose": "Map the approved narration to a coherent visual sequence.", "demoDurationMs": 480, "artifact": { "name": "Visual scene plan", "filename": "visual-plan.json", "type": "visual_plan", "summary": "Scene list, shot intent, continuity, and visual guardrails." } },
+      { "id": "thumbnail", "label": "Thumbnail", "taskId": "task-thumbnail", "executorId": "adapter-thumbnail", "purpose": "Create a deterministic thumbnail specification for a future image adapter.", "demoDurationMs": 500, "artifact": { "name": "Thumbnail specification", "filename": "thumbnail-spec.json", "type": "thumbnail_spec", "summary": "Composition, focal point, palette, and text-free fallback." } },
+      { "id": "seo", "label": "SEO", "taskId": "task-seo", "executorId": "agent-seo", "purpose": "Package discoverable YouTube metadata from accepted content.", "demoDurationMs": 430, "artifact": { "name": "YouTube metadata", "filename": "youtube-metadata.json", "type": "seo_metadata", "summary": "Title, description, chapters, keywords, and pinned-comment draft." } },
+      { "id": "qc", "label": "QC", "taskId": "task-qc", "executorId": "agent-qc", "purpose": "Validate required outputs and reject an incomplete production manifest.", "demoDurationMs": 540, "artifact": { "name": "Quality-control report", "filename": "qc-report.json", "type": "quality_report", "summary": "Contract coverage, continuity checks, and release decision." } },
+      { "id": "upload-package", "label": "Upload Package", "taskId": "task-upload-package", "executorId": "tool-packager", "purpose": "Assemble the accepted artifacts into a creator-controlled upload handoff.", "demoDurationMs": 560, "artifact": { "name": "YouTube upload package", "filename": "upload-package.json", "type": "upload_manifest", "summary": "Complete artifact manifest marked Ready for YouTube." } }
+    ]
+  }
+}
+

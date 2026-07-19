@@ -7,9 +7,14 @@ import {
   serializeMissionState,
   validateMissionData
 } from "/app/mission-engine.js";
+import {
+  advanceEpisodeRun,
+  startEpisodeRun,
+  validateOrchestrationData
+} from "/app/orchestration-engine.js";
 
-const DATA_URL = "/data/demo-mission.json";
-const STORAGE_KEY = "mission-control:demo-state:v1";
+const DATA_URL = "/data/episode-pipeline.json";
+const STORAGE_KEY = "mission-control:episode-pipeline:v1";
 
 const elements = {
   dashboard: document.querySelector("#dashboard"),
@@ -45,6 +50,13 @@ const elements = {
   activityList: document.querySelector("#activity-list"),
   decisionCount: document.querySelector("#decision-count"),
   decisionList: document.querySelector("#decision-list"),
+  createEpisodeButton: document.querySelector("#create-episode-button"),
+  createEpisodeLabel: document.querySelector("#create-episode-label"),
+  runStatus: document.querySelector("#run-status"),
+  providerStatus: document.querySelector("#provider-status"),
+  orchestrationPipeline: document.querySelector("#orchestration-pipeline"),
+  readyPanel: document.querySelector("#ready-panel"),
+  readyArtifactName: document.querySelector("#ready-artifact-name"),
   resetButton: document.querySelector("#reset-button"),
   approveButton: document.querySelector("#approve-button"),
   changesButton: document.querySelector("#changes-button"),
@@ -54,6 +66,7 @@ const elements = {
 let originalState;
 let state;
 let toastTimer;
+let runToken = 0;
 
 function escapeHtml(value) {
   return String(value ?? "")
@@ -113,11 +126,53 @@ function showToast(message) {
   toastTimer = setTimeout(() => elements.toast.classList.remove("is-visible"), 3200);
 }
 
+function delay(milliseconds) {
+  return new Promise((resolve) => setTimeout(resolve, milliseconds));
+}
+
+function renderOrchestration() {
+  const { orchestration } = state;
+  const isRunning = orchestration.status === "running";
+  const isReady = orchestration.status === "ready";
+  const currentStage = orchestration.stages.find((stage) => stage.id === orchestration.currentStageId);
+
+  elements.providerStatus.textContent = orchestration.providerStatus;
+  elements.createEpisodeButton.disabled = isRunning;
+  elements.createEpisodeButton.classList.toggle("is-running", isRunning);
+  elements.createEpisodeLabel.textContent = isRunning
+    ? `${currentStage?.label ?? "Pipeline"} working…`
+    : isReady
+      ? "Create Another Episode"
+      : "Create Episode";
+  elements.runStatus.textContent = isRunning
+    ? `${currentStage?.label ?? "Pipeline"} is active. CEO Brain will route the accepted artifact automatically.`
+    : isReady
+      ? "All ten production stages completed successfully."
+      : "Ready for one-command execution.";
+
+  elements.orchestrationPipeline.innerHTML = orchestration.stages.map((stage, index) => {
+    const task = state.tasks.find((candidate) => candidate.id === stage.taskId);
+    const artifact = state.artifacts.find((candidate) => candidate.producedByTaskId === stage.taskId);
+    const taskState = task?.state ?? "pending";
+    return `
+      <li class="pipeline-step ${escapeHtml(taskState)}">
+        <span class="pipeline-index" aria-hidden="true">${taskState === "complete" ? "✓" : index + 1}</span>
+        <div class="pipeline-copy"><strong>${escapeHtml(stage.label)}</strong><span>${escapeHtml(humanize(taskState))}</span></div>
+        <small>${escapeHtml(artifact?.filename ?? stage.purpose)}</small>
+      </li>
+    `;
+  }).join("");
+
+  const finalArtifact = state.artifacts.find((artifact) => artifact.type === "upload_manifest");
+  elements.readyPanel.hidden = !isReady;
+  elements.readyArtifactName.textContent = finalArtifact?.filename ?? "upload-package.json";
+}
+
 function renderMissionHeader() {
   const { mission } = state;
   elements.missionName.textContent = mission.name;
   elements.missionId.textContent = mission.id;
-  elements.updatedLabel.textContent = `Updated ${formatDateTime(mission.updatedAt)} · demo-mission.json`;
+  elements.updatedLabel.textContent = `Updated ${formatDateTime(mission.updatedAt)} · episode-pipeline.json`;
 }
 
 function renderHealth() {
@@ -173,8 +228,12 @@ function renderBlocker() {
     elements.blockerStrip.querySelector(".section-label").textContent = "Blocker status";
     elements.blockerStrip.querySelector(".blocker-icon").textContent = "✓";
     elements.blockerTitle.textContent = "Critical path is clear";
-    elements.blockerCause.textContent = "The thumbnail approval gate was resolved and downstream work can continue.";
-    elements.blockerResolution.textContent = "Quality review is now active.";
+    elements.blockerCause.textContent = state.orchestration.status === "running"
+      ? "CEO Brain is routing accepted artifacts through the frozen workflow."
+      : "No unresolved dependency or approval gate is blocking the episode pipeline.";
+    elements.blockerResolution.textContent = state.orchestration.status === "ready"
+      ? "Upload package is ready."
+      : "Continue the approved critical path.";
     return;
   }
 
@@ -186,7 +245,7 @@ function renderBlocker() {
 }
 
 function renderStages() {
-  const stageOrder = ["Editorial", "Production", "Review", "Publishing"];
+  const stageOrder = [...new Set(state.tasks.map((task) => task.stage))];
   const stageStates = stageOrder.map((stage) => {
     const tasks = state.tasks.filter((task) => task.stage === stage);
     const allComplete = tasks.length > 0 && tasks.every((task) => task.state === "complete");
@@ -251,6 +310,7 @@ function renderDecisions() {
 }
 
 function render() {
+  renderOrchestration();
   renderMissionHeader();
   renderHealth();
   renderNextAction();
@@ -282,8 +342,35 @@ function runAction(action) {
   }
 }
 
+async function createEpisode() {
+  const token = ++runToken;
+  try {
+    state = startEpisodeRun(originalState, { timestamp: nowIso() });
+    persistState();
+    render();
+    showToast("Create Episode accepted. CEO Brain is orchestrating the pipeline.");
+
+    while (state.orchestration.status === "running" && token === runToken) {
+      const currentStage = state.orchestration.stages.find((stage) => stage.id === state.orchestration.currentStageId);
+      await delay(currentStage?.demoDurationMs ?? 450);
+      if (token !== runToken) return;
+      state = advanceEpisodeRun(state, { timestamp: nowIso() });
+      persistState();
+      render();
+    }
+
+    if (token === runToken && state.orchestration.status === "ready") {
+      showToast("Episode complete. Upload package is Ready for YouTube.");
+      elements.readyPanel.scrollIntoView({ behavior: "smooth", block: "center" });
+    }
+  } catch (error) {
+    showToast(error.message);
+  }
+}
+
 function resetDemo() {
   if (!originalState) return;
+  runToken += 1;
   state = cloneMissionState(originalState);
   localStorage.removeItem(STORAGE_KEY);
   render();
@@ -296,9 +383,11 @@ async function loadMission() {
     if (!response.ok) throw new Error(`The mission source returned HTTP ${response.status}.`);
     const data = await response.json();
     validateMissionData(data);
+    validateOrchestrationData(data);
 
     originalState = recalculateMissionHealth(data);
     state = restoreMissionState(data, localStorage.getItem(STORAGE_KEY)) ?? cloneMissionState(originalState);
+    validateOrchestrationData(state);
     render();
     elements.loading.hidden = true;
     elements.dashboard.hidden = false;
@@ -311,6 +400,7 @@ async function loadMission() {
 
 elements.approveButton.addEventListener("click", () => runAction("approve"));
 elements.changesButton.addEventListener("click", () => runAction("request_changes"));
+elements.createEpisodeButton.addEventListener("click", createEpisode);
 elements.resetButton.addEventListener("click", resetDemo);
 
 loadMission();

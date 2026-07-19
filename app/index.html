@@ -16,7 +16,8 @@
       <div class="brand-mark" aria-hidden="true"><span class="brand-orbit"></span><span class="brand-core"></span></div>
       <div class="brand-copy"><strong>Mission Control</strong><span>Governance layer</span></div>
       <nav class="nav-list" aria-label="Dashboard sections">
-        <a class="nav-item is-active" href="#overview" aria-current="page"><span class="nav-icon" aria-hidden="true">⌁</span>Overview</a>
+        <a class="nav-item is-active" href="#episode-run" aria-current="page"><span class="nav-icon" aria-hidden="true">▶</span>Create</a>
+        <a class="nav-item" href="#overview"><span class="nav-icon" aria-hidden="true">⌁</span>Overview</a>
         <a class="nav-item" href="#workflow"><span class="nav-icon" aria-hidden="true">↳</span>Workflow</a>
         <a class="nav-item" href="#history"><span class="nav-icon" aria-hidden="true">≡</span>History</a>
       </nav>
@@ -33,6 +34,29 @@
       </header>
 
       <div class="dashboard" id="dashboard" hidden>
+        <section class="episode-run" id="episode-run" aria-labelledby="episode-run-heading">
+          <article class="launch-card surface">
+            <div class="launch-copy">
+              <div class="launch-kicker"><span class="live-dot" aria-hidden="true"></span>CEO Brain · autonomous orchestration</div>
+              <h2 id="episode-run-heading">One command. Entire episode workflow.</h2>
+              <p>CEO Brain routes accepted outputs from research through quality control, then assembles a creator-controlled YouTube upload package.</p>
+              <div class="launch-meta"><span>Deterministic demo mode</span><span id="provider-status">OpenAI adapter deferred</span></div>
+            </div>
+            <div class="launch-action">
+              <button class="button button-launch" id="create-episode-button" type="button"><span aria-hidden="true">▶</span><span id="create-episode-label">Create Episode</span></button>
+              <p id="run-status" aria-live="polite">Ready for one-command execution.</p>
+            </div>
+          </article>
+
+          <ol class="pipeline-grid" id="orchestration-pipeline" aria-label="Autonomous episode production pipeline"></ol>
+
+          <article class="ready-panel surface" id="ready-panel" hidden>
+            <div class="ready-mark" aria-hidden="true">✓</div>
+            <div><span class="section-label">Production handoff complete</span><h3>Ready for YouTube</h3><p>QC accepted every stage contract. The upload manifest is ready for the creator-controlled external action.</p></div>
+            <div class="ready-artifact"><span>Final artifact</span><strong id="ready-artifact-name">upload-package.json</strong></div>
+          </article>
+        </section>
+
         <section class="overview" id="overview" aria-labelledby="health-heading">
           <div class="overview-heading">
             <div><p class="eyebrow">Mission health</p><h2 id="health-heading">Know the health. Know the next move.</h2></div>
@@ -95,10 +119,10 @@
           </article>
         </section>
 
-        <footer class="data-footer"><span>Source: <code>data/demo-mission.json</code></span><span>Progress is saved in this browser. Reset demo clears it.</span></footer>
+        <footer class="data-footer"><span>Source: <code>data/episode-pipeline.json</code></span><span>Deterministic demo · no external publish · progress saved locally</span></footer>
       </div>
 
-      <section class="loading-state surface" id="loading-state" aria-live="polite"><span class="loading-spinner" aria-hidden="true"></span><div><strong>Loading mission state</strong><p>Reading data/demo-mission.json…</p></div></section>
+      <section class="loading-state surface" id="loading-state" aria-live="polite"><span class="loading-spinner" aria-hidden="true"></span><div><strong>Loading mission state</strong><p>Reading data/episode-pipeline.json…</p></div></section>
       <section class="error-state surface" id="error-state" hidden role="alert"><span aria-hidden="true">!</span><div><strong>Mission data could not be loaded</strong><p id="error-message"></p></div></section>
     </main>
   </div>

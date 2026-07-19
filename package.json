@@ -5,9 +5,9 @@
   "type": "module",
   "scripts": {
     "start": "node app/server.mjs",
-    "check": "node --check app/app.js && node --check app/mission-engine.js && node --check app/server.mjs && node --test work/mission-engine.test.mjs",
-    "test": "node --test work/mission-engine.test.mjs",
-    "verify:browser": "node work/verify-dashboard-cdp.mjs"
+    "check": "node --check app/app.js && node --check app/mission-engine.js && node --check app/orchestration-engine.js && node --check app/server.mjs && node --test work/mission-engine.test.mjs work/orchestration-engine.test.mjs",
+    "test": "node --test work/mission-engine.test.mjs work/orchestration-engine.test.mjs",
+    "verify:browser": "node work/verify-orchestration-cdp.mjs"
   }
 }
 

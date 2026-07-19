@@ -1,5 +1,27 @@
 # Architecture
 
+## Autonomous episode path
+
+`Create Episode` starts one deterministic orchestration run:
+
+```mermaid
+flowchart LR
+    U[Creator] --> C[CEO Brain]
+    C --> R[Research]
+    R --> S[Script]
+    S --> D[Devotional]
+    D --> V[Voice adapter]
+    V --> VP[Visual plan]
+    VP --> T[Thumbnail adapter]
+    T --> SEO[SEO]
+    SEO --> QC[QC]
+    QC --> P[Upload package]
+```
+
+`app/orchestration-engine.js` owns run state, ordered routing, artifact contracts, and the final handoff. It delegates health calculation and persistence validation to the existing deterministic mission engine. `data/episode-pipeline.json` is the source-controlled contract. The browser animates state returned by the engine; it does not invent stage completion independently.
+
+Voice and thumbnail stages currently produce adapter manifests, and the final stage produces an upload manifest. No external AI, media-generation, or YouTube action occurs until a configured provider adapter is added later.
+
 ## System components
 
 ### 1. Mission Planner

@@ -1,5 +1,16 @@
 # Decision Log
 
+## Sprint 1–2 scope lock
+
+- One `Create Episode` command starts the complete frozen workflow.
+- The ordered critical path is CEO, Research, Script, Devotional, Voice, Visual, Thumbnail, SEO, QC, Upload Package.
+- Every stage produces an inspectable artifact contract before the next stage starts.
+- The live interface renders engine state; it does not fake progress separately from the orchestrator.
+- OpenAI and external media adapters are deferred until the API key is added.
+- Demo-mode voice and thumbnail stages produce manifests, not falsely claimed media files.
+- Mission Control stops at `Ready for YouTube`; upload remains creator-controlled.
+- No unrelated feature enters Sprint 1 or Sprint 2.
+
 ## Locked product decisions
 
 | Decision | Choice | Rationale |

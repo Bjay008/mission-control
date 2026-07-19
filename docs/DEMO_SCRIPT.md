@@ -1,5 +1,30 @@
 # Three-Minute Demo Script
 
+## Winning path — one command (0:00–1:20)
+
+Open Mission Control at the **Create Episode** panel.
+
+Say: “A creator gives one command. CEO Brain owns the critical path and routes every accepted output to the next specialist.”
+
+Select **Create Episode** once. Do not click anything else while the pipeline runs.
+
+Point to the live sequence as each stage completes:
+
+1. CEO
+2. Research
+3. Script
+4. Devotional
+5. Voice
+6. Visual
+7. Thumbnail
+8. SEO
+9. QC
+10. Upload Package
+
+When the final panel appears, say: “Every stage produced an inspectable contract. QC accepted the package, and Mission Control stopped before the creator-controlled YouTube action.”
+
+The demo-mode label must remain visible. Do not claim OpenAI, voice synthesis, image generation, or YouTube publishing ran live until those adapters are configured.
+
 ## Demo goal
 
 Show one complete governance loop: a mission is at risk, Mission Control explains why, a human makes the required decision, and execution continues with improved mission health.
