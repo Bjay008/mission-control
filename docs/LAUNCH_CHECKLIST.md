@@ -12,7 +12,7 @@
 ## Verification
 
 - [x] Four JavaScript syntax checks pass
-- [x] Deterministic tests pass: 11/11
+- [x] Deterministic tests pass: 12/12
 - [x] Browser workflow passes
 - [x] Approval and completion persist after refresh
 - [x] Reset clears saved state
