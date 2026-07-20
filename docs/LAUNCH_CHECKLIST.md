@@ -28,10 +28,11 @@
 - [x] Opening command screenshot captured
 - [x] Creator-approval screenshot captured
 - [x] Ready for YouTube screenshot captured
-- [x] Three-minute demo recorded and exported
+- [x] Three-minute captioned master recorded and exported
 
 ## Remaining external publishing actions
 
+- [ ] Create a narrated export under three minutes explaining how Codex and GPT-5.6 were used
 - [ ] Upload the three screenshots to DevPost
 - [ ] Upload or link the three-minute demo video
 - [ ] Paste the final submission copy
