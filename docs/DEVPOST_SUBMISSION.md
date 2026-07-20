@@ -39,7 +39,7 @@ Most agent demos emphasize autonomous action. Mission Control emphasizes governe
 - the mission reaches 100% Ready for YouTube
 - 12 deterministic tests pass
 - browser verification passes with persistence, zero console errors, and no mobile overflow
-- a three-minute demo and seven-slide system-design deck are complete
+- a three-minute screen-capture master and seven-slide system-design deck are complete; the sub-three-minute narrated export remains
 
 ## How Codex was used
 
