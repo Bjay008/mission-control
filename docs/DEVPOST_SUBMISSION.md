@@ -37,7 +37,7 @@ Most agent demos emphasize autonomous action. Mission Control emphasizes governe
 - approval is recorded in decisions and recent activity
 - Upload Package completes only after approval
 - the mission reaches 100% Ready for YouTube
-- 11 deterministic tests pass
+- 12 deterministic tests pass
 - browser verification passes with persistence, zero console errors, and no mobile overflow
 - a three-minute demo and seven-slide system-design deck are complete
 
