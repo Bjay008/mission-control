@@ -9,6 +9,7 @@ Mission Control keeps long-running missions moving by coordinating AI, tools, an
 - [Launch the interactive Mission Control demo](https://mission-control-long-running.trees-net902.chatgpt.site)
 - [View the OpenAI Build Week submission](https://devpost.com/software/mission-control-opjt7a)
 - [Explore the public source repository](https://github.com/Bjay008/mission-control)
+- [Download the repository as a ZIP](https://github.com/Bjay008/mission-control/archive/refs/heads/main.zip) or follow the [download guide](docs/download-repo.md)
 
 It brings three views of the same mission state together:
 
