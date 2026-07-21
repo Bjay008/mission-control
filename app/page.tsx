@@ -1,243 +1,74 @@
-"use client";
+﻿"use client";
 
-import { useState } from "react";
+import { useEffect, useMemo, useState } from "react";
+import { ACTORS, EVIDENCE, INSIGHT_METRICS, MISSION, PRINCIPLES, type DecisionState, type ViewId } from "./mission-data";
 
-const CANONICAL_LINE =
-  "Mission control keeps long-running missions moving. by coordinating AI, tools and people, with clear, explainable decisions.";
-
-const stages = [
-  { name: "Research", detail: "Sources gathered", type: "AI + tools" },
-  { name: "Planning", detail: "365-day structure", type: "AI" },
-  { name: "Generation", detail: "Daily plan created", type: "AI" },
-  { name: "Quality Control", detail: "Checks passed", type: "Tool" },
+const CANONICAL_LINE = "Mission Control keeps long-running missions moving by coordinating AI, tools, and people through clear, explainable decisions.";
+const allViews: { id: ViewId; label: string; operatorOnly?: boolean }[] = [
+  { id: "today", label: "Today" }, { id: "missions", label: "Missions" }, { id: "momentum", label: "Momentum" },
+  { id: "control", label: "Control", operatorOnly: true }, { id: "decisions", label: "Decisions" },
+  { id: "evidence", label: "Evidence", operatorOnly: true }, { id: "team", label: "Team", operatorOnly: true },
+  { id: "insights", label: "Insights", operatorOnly: true },
 ];
 
+function Metric({ value, label, tone = "green" }: { value: string; label: string; tone?: "green" | "violet" | "amber" }) {
+  return <div className={`metric tone-${tone}`}><strong>{value}</strong><span>{label}</span></div>;
+}
+function ViewHeader({ eyebrow, title, copy }: { eyebrow: string; title: string; copy: string }) {
+  return <header className="view-header"><div><p className="kicker">{eyebrow}</p><h3>{title}</h3></div><p>{copy}</p></header>;
+}
+function TodayView({ approved, onComplete }: { approved: boolean; onComplete: () => void }) {
+  return <div className="view-grid today-view">
+    <section className="focus-card momentum-card"><div className="card-topline"><span>Today Â· Day 48</span><span>20 min</span></div><p className="kicker violet">Your next meaningful action</p><h4>{approved ? "Complete todayâ€™s reading and reflection" : "Review the verified 365-day publish plan"}</h4><p>{approved ? "The mission is moving. Your reflection protects the quality of tomorrowâ€™s next step." : "Your judgment is the final checkpoint between a verified plan and execution."}</p><button className="primary-action violet-action" type="button" onClick={onComplete}>{approved ? "Mark today complete" : "Open human decision"}<span aria-hidden="true">â†—</span></button></section>
+    <section className="streak-card"><div className="ring-progress" aria-label="48 day streak"><strong>48</strong><span>day streak</span></div><div><p className="kicker violet">Momentum state</p><h4>On fire</h4><p>Two days to the Bonfire milestone.</p></div></section>
+    <section className="mini-timeline"><p className="kicker">Why this matters</p><ol><li><b>Now</b><span>{approved ? "Daily action ready" : "Human review required"}</span></li><li><b>Next</b><span>{approved ? "Protect the 48-day rhythm" : "Publish the verified plan"}</span></li><li><b>Then</b><span>Reach Bonfire at day 50</span></li></ol></section>
+  </div>;
+}
+function MissionsView({ approved }: { approved: boolean }) {
+  return <div className="mission-portfolio"><article className="mission-row featured-row"><div className="mission-index">01</div><div><span className="status-label">Primary proof of concept</span><h4>{MISSION.title}</h4><p>{MISSION.purpose}</p></div><Metric value={approved ? "Resumed" : "Awaiting human"} label="Current state" tone={approved ? "green" : "amber"} /><Metric value="13%" label="48 of 365 steps" tone="violet" /><div className="mission-next"><span>Clear next step</span><strong>{approved ? "Complete Day 48" : "Approve publish plan"}</strong></div></article><div className="portfolio-summary"><span>1 active mission</span><span>{approved ? "0 pending decisions" : "1 pending decision"}</span><span>0 unresolved blockers</span><span>100% owner coverage</span></div></div>;
+}
+function MomentumView({ approved }: { approved: boolean }) {
+  return <div className="momentum-layout"><section className="momentum-hero-card"><p className="kicker violet">Human momentum</p><span className="flame">âœ¦</span><strong>48</strong><h4>days, still moving.</h4><p>{approved ? "Approval became action. The missionâ€™s next step is ready." : "A deliberate pause does not break momentum. It protects it."}</p></section><section className="consistency-card"><div className="card-topline"><span>Consistency Â· last 28 days</span><span>100%</span></div><div className="day-grid" aria-label="28 completed days">{Array.from({ length: 28 }, (_, i) => <span key={i} className={i > 24 ? "hot" : "done"} />)}</div><div className="milestone-line"><div><span>Next milestone</span><strong>Bonfire Â· Day 50</strong></div><b>2 days</b></div></section><section className="achievement-card"><span className="achievement-icon">M</span><div><p className="kicker violet">Verified achievement</p><h4>First humanâ€“AI handoff</h4><p>{approved ? "Unlocked today Â· Approval recorded in the audit trail." : "Ready to unlock when the publish plan is approved."}</p></div></section></div>;
+}
+function ControlView({ approved }: { approved: boolean }) {
+  return <div className="control-grid"><section className="workflow-card"><div className="card-topline"><span>Live workflow</span><span className={approved ? "live" : "waiting"}>{approved ? "Execution active" : "Awaiting human"}</span></div><div className="workflow-list">{MISSION.stages.map((stage, i) => <div className={`workflow-row ${stage.pending && !approved ? "pending" : "complete"}`} key={stage.name}><span className="step-no">0{i + 1}</span><div><strong>{stage.name}</strong><small>{stage.owner}</small></div><span>{stage.pending ? (approved ? "Active" : "Waiting") : "Complete"}</span></div>)}</div></section><section className="system-card"><p className="kicker">System health</p><div className="health-score"><strong>99.8</strong><span>%</span></div><p>All evidence checks passed. No unresolved blockers. One clear owner for every active task.</p><div className="health-bars"><span style={{ width: "100%" }} /><span style={{ width: "92%" }} /><span style={{ width: approved ? "96%" : "74%" }} /></div></section><section className="handoff-card"><p className="kicker">Current handoff</p><div className="handoff-flow"><span>Quality tool</span><i>â†’</i><span className="human-node">Human owner</span><i>â†’</i><span>Mission Control</span></div><p><b>Reason:</b> The next decision changes what gets published. Human accountability stays explicit.</p></section></div>;
+}
+function DecisionsView({ decision, onDecision }: { decision: DecisionState; onDecision: (state: DecisionState) => void }) {
+  const approved = decision === "approved";
+  return <div className={`decision-detail ${approved ? "approved" : ""}`}><section className="decision-spotlight"><p className="kicker amber">{approved ? "Decision recorded" : "Human judgment required"}</p><h4>{approved ? "The mission is moving again." : "The mission is paused by design."}</h4><p>{approved ? "Approval, owner, reason, and resume action are now part of the mission record." : "After Quality Control, the mission pausesâ€”not because something failed, but because this decision belongs to a human."}</p><div className="decision-facts"><div><span>Owner</span><strong>Mission owner</strong></div><div><span>AI recommendation</span><strong>Approve Â· 94% confidence</strong></div><div><span>Resumes</span><strong>Publish verified plan</strong></div></div><div className="decision-actions"><button className="primary-action" disabled={approved} onClick={() => onDecision("approved")}>{approved ? "Approved & resumed" : "Approve & resume"}<span>âœ“</span></button>{!approved && <><button onClick={() => onDecision("revision")}>Request revision</button><button onClick={() => onDecision("rejected")}>Reject</button><button onClick={() => onDecision("delegated")}>Delegate</button></>}</div>{decision !== "pending" && !approved && <p className="decision-feedback" aria-live="polite">Decision updated: {decision}. The mission remains safely paused.</p>}</section><aside className="evidence-stack"><p className="kicker">Decision evidence</p>{EVIDENCE.slice(0, 3).map(item => <div key={item.title}><span className="verified-dot" /><div><strong>{item.title}</strong><small>{item.source} Â· {item.status}</small></div></div>)}</aside></div>;
+}
+function EvidenceView() { return <div className="data-table evidence-table"><div className="table-head"><span>Evidence</span><span>Source</span><span>Related step</span><span>Status</span></div>{EVIDENCE.map(item => <div className="table-row" key={item.title}><strong>{item.title}</strong><span>{item.source}</span><span>{item.step}</span><span className={item.status === "Verified" ? "verified" : "pending-text"}>â— {item.status}</span></div>)}</div>; }
+function TeamView() { return <div className="actor-grid">{ACTORS.map(actor => <article key={actor.name}><div className={`actor-mark ${actor.kind.toLowerCase()}`}>{actor.initials}</div><div><span>{actor.kind}</span><h4>{actor.name}</h4><p>{actor.role}</p></div><small>{actor.status}</small></article>)}</div>; }
+function InsightsView() { return <div className="insight-grid">{INSIGHT_METRICS.map((metric, i) => <article key={metric.label}><span>0{i + 1}</span><strong>{metric.value}</strong><h4>{metric.label}</h4><p>{metric.note}</p><div className="spark"><i style={{ width: metric.fill }} /></div></article>)}</div>; }
+
 export default function Home() {
-  const [approved, setApproved] = useState(false);
-
-  return (
-    <div className="site-shell">
-      <aside className="rail" aria-label="Primary navigation">
-        <a className="brand-mark" href="#top" aria-label="Mission Control home">
-          MC
-        </a>
-        <nav className="rail-nav" aria-label="Page sections">
-          <a className="rail-link is-active" href="#mission">
-            <span>01</span>
-            <span className="rail-label">Mission</span>
-          </a>
-          <a className="rail-link" href="#decision">
-            <span>02</span>
-            <span className="rail-label">Decision</span>
-          </a>
-          <a className="rail-link" href="#story">
-            <span>03</span>
-            <span className="rail-label">Story</span>
-          </a>
-        </nav>
-        <div className="system-state">
-          <span className="state-dot" />
-          <span>System live</span>
-        </div>
-      </aside>
-
-      <main id="top">
-        <header className="topbar">
-          <a className="wordmark" href="#top">
-            Mission <span>Control</span>
-          </a>
-          <div className="topbar-meta">
-            <span>Proof of concept</span>
-            <span className="live-label"><i />All systems nominal</span>
-          </div>
-        </header>
-
-        <section className="hero" aria-labelledby="hero-title">
-          <div className="hero-copy">
-            <p className="eyebrow">Orchestration for consequential work</p>
-            <h1 id="hero-title">
-              Every mission deserves <em>mission control.</em>
-            </h1>
-            <p className="canonical-line">{CANONICAL_LINE}</p>
-            <a className="text-link" href="#mission">
-              See the mission in motion <span aria-hidden="true">↓</span>
-            </a>
-          </div>
-
-          <div className="orbit" aria-label="Mission progress: day 174 of 365">
-            <span className="orbit-node node-ai">AI</span>
-            <span className="orbit-node node-tools">Tools</span>
-            <span className="orbit-node node-human">Human</span>
-            <div className="orbit-core">
-              <strong>174</strong>
-              <span>of 365 days</span>
-              <small>in motion</small>
-            </div>
-          </div>
-        </section>
-
-        <section className="mission-section" id="mission" aria-labelledby="mission-heading">
-          <div className="section-intro">
-            <p className="eyebrow">Live demonstration</p>
-            <h2 id="mission-heading">Bible in 365 days</h2>
-            <p>The proof of concept is the mission. Mission Control is the product.</p>
-          </div>
-
-          <div className="mission-grid">
-            <article className="panel workflow-panel">
-              <div className="panel-header">
-                <div>
-                  <span className="micro-label">Active mission</span>
-                  <h3>Bible in 365 days</h3>
-                </div>
-                <span className={`mission-status ${approved ? "is-running" : "is-paused"}`}>
-                  <i />{approved ? "Running" : "Awaiting human"}
-                </span>
-              </div>
-
-              <div className="progress-track" aria-label={approved ? "Mission resumed" : "Quality Control complete; human approval required"}>
-                {[0, 1, 2, 3, 4].map((step) => (
-                  <span
-                    key={step}
-                    className={step < 4 || approved ? "progress-segment is-complete" : "progress-segment"}
-                  />
-                ))}
-              </div>
-
-              <div className="stage-list">
-                {stages.map((stage, index) => (
-                  <div className="stage-row" key={stage.name}>
-                    <span className="stage-index">0{index + 1}</span>
-                    <div className="stage-main">
-                      <strong>{stage.name}</strong>
-                      <span>{stage.detail}</span>
-                    </div>
-                    <span className="stage-owner">{stage.type}</span>
-                    <span className="stage-state is-complete">Complete</span>
-                  </div>
-                ))}
-                <div className={`stage-row is-next ${approved ? "is-active" : ""}`}>
-                  <span className="stage-index">05</span>
-                  <div className="stage-main">
-                    <strong>Publish plan</strong>
-                    <span>{approved ? "Execution resumed" : "Waiting for approval"}</span>
-                  </div>
-                  <span className="stage-owner">Mission Control</span>
-                  <span className={`stage-state ${approved ? "is-running" : "is-waiting"}`}>
-                    {approved ? "In progress" : "Next"}
-                  </span>
-                </div>
-              </div>
-            </article>
-
-            <aside className={`panel decision-panel ${approved ? "is-approved" : ""}`} id="decision" aria-labelledby="decision-title">
-              <div className="decision-signal">
-                <span className="pause-symbol" aria-hidden="true">{approved ? "✓" : "Ⅱ"}</span>
-                <span>{approved ? "Decision recorded" : "Human decision required"}</span>
-              </div>
-              <h3 id="decision-title">
-                {approved ? "The mission is moving again." : "The mission is paused by design."}
-              </h3>
-              <p>
-                {approved
-                  ? "Approval and its reason are now part of the mission record. Execution has resumed with a clear next step."
-                  : "After Quality Control, the mission pauses. Not because something failed, but because this decision belongs to a human."}
-              </p>
-
-              <dl className="decision-details">
-                <div>
-                  <dt>Owner</dt>
-                  <dd>You</dd>
-                </div>
-                <div>
-                  <dt>Reason</dt>
-                  <dd>{approved ? "Plan approved for release" : "Human judgment required"}</dd>
-                </div>
-                <div>
-                  <dt>Next step</dt>
-                  <dd>{approved ? "Publish the reading plan" : "Review and approve continuation"}</dd>
-                </div>
-              </dl>
-
-              <button
-                className="approve-button"
-                type="button"
-                onClick={() => setApproved(true)}
-                disabled={approved}
-              >
-                <span>{approved ? "Mission resumed" : "Approve & resume"}</span>
-                <span aria-hidden="true">{approved ? "✓" : "→"}</span>
-              </button>
-              <p className="decision-footnote" aria-live="polite">
-                {approved ? "Decision recorded. Mission resumed." : "Every handoff has a reason."}
-              </p>
-            </aside>
-          </div>
-        </section>
-
-        <section className="principles" aria-label="Mission Control principles">
-          <article>
-            <span>01 / Ownership</span>
-            <h3>Every task has an owner.</h3>
-            <p>Responsibility stays visible across AI, tools, and people.</p>
-          </article>
-          <article>
-            <span>02 / Reason</span>
-            <h3>Every handoff has a reason.</h3>
-            <p>Decisions remain explainable long after the work moves on.</p>
-          </article>
-          <article>
-            <span>03 / Momentum</span>
-            <h3>Every mission has a clear next step.</h3>
-            <p>No lost context. No ambiguous state. No stalled momentum.</p>
-          </article>
-        </section>
-
-        <section className="story-section" id="story" aria-labelledby="story-title">
-          <div className="story-heading">
-            <p className="eyebrow">One operating model</p>
-            <h2 id="story-title">Built for work that outlives a single prompt.</h2>
-          </div>
-          <div className="story-grid">
-            <article>
-              <span className="story-number">01</span>
-              <div>
-                <p className="micro-label">The problem</p>
-                <h3>Long-running work loses context.</h3>
-                <p>Decisions become unclear, ownership fades, and teams lose momentum because no one knows what happens next.</p>
-              </div>
-            </article>
-            <article className="signature-card">
-              <span className="story-number">02</span>
-              <div>
-                <p className="micro-label">The signature moment</p>
-                <h3>Not a failure. A human decision.</h3>
-                <p>Mission Control knows when execution should stop, who owns the decision, and exactly what resumes after approval.</p>
-              </div>
-            </article>
-            <article>
-              <span className="story-number">03</span>
-              <div>
-                <p className="micro-label">The vision</p>
-                <h3>Any complex mission can keep moving.</h3>
-                <p>Today it is Bible in 365 days. Tomorrow it could be a product launch, a research project, or what comes next.</p>
-              </div>
-            </article>
-          </div>
-        </section>
-
-        <section className="closing" aria-labelledby="closing-title">
-          <p className="eyebrow">Mission Control</p>
-          <h2 id="closing-title">Every mission deserves mission control.</h2>
-          <p className="canonical-line">{CANONICAL_LINE}</p>
-          <a className="closing-link" href="#mission">Return to the mission <span aria-hidden="true">↑</span></a>
-        </section>
-
-        <footer>
-          <span>Mission Control</span>
-          <span>Clear owner. Clear reason. Clear next step.</span>
-        </footer>
-      </main>
-    </div>
-  );
+  const [role, setRole] = useState<"participant" | "operator">("operator");
+  const [view, setView] = useState<ViewId>("today");
+  const [decision, setDecision] = useState<DecisionState>(() => {
+    if (typeof window === "undefined") return "pending";
+    return (window.localStorage.getItem("mission-control-demo-decision") as DecisionState | null) ?? "pending";
+  });
+  const approved = decision === "approved";
+  useEffect(() => { window.localStorage.setItem("mission-control-demo-decision", decision); }, [decision]);
+  const visibleViews = useMemo(() => allViews.filter(item => role === "operator" || !item.operatorOnly), [role]);
+  function chooseView(next: ViewId) { setView(next); document.getElementById("dashboard")?.scrollIntoView({ behavior: "smooth", block: "start" }); }
+  function decide(next: DecisionState) { setDecision(next); if (next === "approved") setView("control"); }
+  return <main>
+    <header className="site-header"><a className="brand" href="#top"><span className="brand-symbol">MC</span><span>Mission Control</span></a><nav aria-label="Landing page navigation"><a href="#why">Why</a><a href="#dashboard">Live demo</a><a href="#model">Model</a></nav><a className="header-cta" href="#dashboard">Enter cockpit <span>â†—</span></a></header>
+    <section className="hero" id="top"><div className="hero-copy"><p className="kicker">Human momentum Â· operational control</p><h1>Important work<br /><em>should keep moving.</em></h1><p className="hero-lede">{CANONICAL_LINE}</p><div className="hero-actions"><a className="primary-action" href="#dashboard">See the mission in motion <span>â†“</span></a><a href="#why">Discover the operating model</a></div></div><div className="hero-visual" aria-label="Mission state visualization"><div className="signal-orbit orbit-one" /><div className="signal-orbit orbit-two" /><div className="hero-core"><span>DAY</span><strong>48</strong><small>of 365</small></div><span className="orbit-label label-human">Human Â· momentum</span><span className="orbit-label label-ai">AI Â· planning</span><span className="orbit-label label-tools">Tools Â· verified</span><div className="pulse-card"><span className={approved ? "live-dot" : "amber-dot"} /><div><small>Mission state</small><strong>{approved ? "Execution resumed" : "Awaiting human"}</strong></div></div></div><div className="hero-principles">{PRINCIPLES.map((principle, i) => <span key={principle}><i>0{i + 1}</i>{principle}</span>)}</div></section>
+    <section className="why-section" id="why"><div className="section-heading"><p className="kicker violet">One mission. Two perspectives.</p><h2>Momentum is what people feel.<br /><em>Mission Control is what keeps it real.</em></h2></div><div className="perspective-grid"><article className="perspective momentum-perspective"><span>Human view</span><strong>48</strong><h3>days in motion</h3><p>Progress feels personal, warm, and achievable. One meaningful action at a time.</p><div className="mini-progress"><i /><i /><i /><i /><i /></div></article><div className="perspective-bridge"><span>Same mission state</span><i>â†”</i><small>No duplicated truth</small></div><article className="perspective control-perspective"><span>System view</span><strong>48 / 365</strong><h3>steps verified</h3><p>Ownership, evidence, handoffs, and the next decision stay visible.</p><div className="system-readout"><span>4 stages complete</span><span>1 human decision</span><span>0 blockers</span></div></article></div></section>
+    <section className="dashboard-shell" id="dashboard"><header className="cockpit-header"><div><p className="kicker">Live product demonstration</p><h2>Bible in 365 Days</h2></div><div className="cockpit-status"><span className={approved ? "live-dot" : "amber-dot"} /><div><small>Overall state</small><strong>{approved ? "Mission active" : "Awaiting human"}</strong></div></div></header><div className="role-bar"><span>Viewing as</span><button className={role === "participant" ? "active" : ""} onClick={() => { setRole("participant"); if (allViews.find(item => item.id === view)?.operatorOnly) setView("today"); }}>Participant</button><button className={role === "operator" ? "active" : ""} onClick={() => setRole("operator")}>Operator</button><button className="reset-demo" onClick={() => { setDecision("pending"); setView("decisions"); }}>Reset demo</button></div><div className="cockpit-layout"><nav className="view-nav" aria-label="Product views">{visibleViews.map((item, i) => <button key={item.id} className={view === item.id ? "active" : ""} onClick={() => chooseView(item.id)}><span>{String(i + 1).padStart(2, "0")}</span>{item.label}{item.id === "decisions" && !approved && <i>1</i>}</button>)}</nav><section className="view-stage">
+      {view === "today" && <><ViewHeader eyebrow="Personal focus" title="The work that matters now" copy="One daily action connects individual momentum to the missionâ€™s operational state." /><TodayView approved={approved} onComplete={() => setView(approved ? "momentum" : "decisions")} /></>}
+      {view === "missions" && <><ViewHeader eyebrow="Mission portfolio" title="Everything has a state and owner" copy="A concise view of progress, attention, and the clearest next step." /><MissionsView approved={approved} /></>}
+      {view === "momentum" && <><ViewHeader eyebrow="Momentum layer" title="Progress people can feel" copy="Meaningful streaks and achievements derived from verified mission events." /><MomentumView approved={approved} /></>}
+      {view === "control" && <><ViewHeader eyebrow="Control layer" title="The mission operating system" copy="AI activity, tool checks, human accountability, and execution in one cockpit." /><ControlView approved={approved} /></>}
+      {view === "decisions" && <><ViewHeader eyebrow="Decision inbox" title="Judgment stays human" copy="Every pause explains why a person is needed and what resumes after the choice." /><DecisionsView decision={decision} onDecision={decide} /></>}
+      {view === "evidence" && <><ViewHeader eyebrow="Evidence layer" title="Trust has a trail" copy="Each claim is connected to its source, verification state, and workflow step." /><EvidenceView /></>}
+      {view === "team" && <><ViewHeader eyebrow="Mission actors" title="Different roles. Clear authority." copy="Humans remain accountable while agents and tools make their contribution visible." /><TeamView /></>}
+      {view === "insights" && <><ViewHeader eyebrow="Learning loop" title="Signals that improve the mission" copy="A restrained view of velocity, intervention, and riskâ€”not vanity metrics." /><InsightsView /></>}
+    </section></div></section>
+    <section className="human-moment" id="model"><div className="moment-number">01</div><div><p className="kicker amber">The signature moment</p><h2>Not a failure.<br />A human decision.</h2></div><div className="moment-copy"><p>The system knows when to continueâ€”and when judgment belongs to a person. The pause is deliberate, explainable, and reversible.</p><button className="primary-action" onClick={() => { chooseView("decisions"); setRole("operator"); }}>Open the decision <span>â†—</span></button></div></section>
+    <section className="closing"><p className="kicker">Set the mission Â· build momentum Â· keep control</p><h2>Any complex mission<br /><em>can keep moving.</em></h2><p>{CANONICAL_LINE}</p><a className="primary-action" href="#dashboard">Run the live demonstration <span>â†‘</span></a></section>
+    <footer><span>Mission Control Â· OpenAI Build Week</span><span>Every mission deserves mission control.</span></footer>
+  </main>;
 }

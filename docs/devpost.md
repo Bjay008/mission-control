@@ -2,24 +2,26 @@
 
 ## Inspiration
 
-Every day AI helps us generate code, content, and ideas faster than ever. But long-running work still breaks down: context gets lost, decisions become unclear, and teams lose momentum because no one knows what happens next.
+AI helps us generate code, content, and ideas faster than ever, but long-running work still breaks down. Context gets lost, decisions become unclear, and teams lose momentum because nobody knows what happens next.
 
 ## What it does
 
-Mission control keeps long-running missions moving. by coordinating AI, tools and people, with clear, explainable decisions.
+Mission Control keeps long-running missions moving by coordinating AI, tools, and people through clear, explainable decisions.
 
-Every task has an owner. Every handoff has a reason. Every mission has a clear next step.
+It unifies a motivating participant experience with an operational control layer. The same mission state powers Today, Missions, Momentum, Control, Decisions, Evidence, Team, and Insights—so people can feel progress while operators can verify it.
 
-## How the demonstration works
+## The signature moment
 
-Bible in 365 days is the proof of concept. Mission Control coordinates the work across research, planning, generation, Quality Control, and human approval.
+Bible in 365 Days is the proof of concept. After research, planning, generation, and Quality Control, the mission pauses—not because something failed, but because the next decision belongs to a human.
 
-The defining moment happens after Quality Control. The mission pauses—not because something failed, but because that decision belongs to a human. Once approval is given, Mission Control records the decision, resumes execution, and the mission keeps moving.
+The decision inbox shows the owner, supporting evidence, AI recommendation, confidence, consequences, and the exact action that resumes. Approve & Resume updates the decision, workflow, mission state, audit event, and participant’s next action together.
 
 ## Why it matters
 
-The product is not a Bible-reading plan. The product is Mission Control: an operating layer for complex, long-running work where AI, tools, and people each need clear responsibility.
+Momentum is what people feel. Mission Control is what keeps it real.
 
-Today it is Bible in 365 days. Tomorrow it could be a product launch, a research project, or any complex mission.
+Every task has an owner. Every handoff has a reason. Every mission has a clear next step.
+
+Today it is Bible in 365 Days. Tomorrow it could be a product launch, research program, coaching journey, or any complex mission.
 
 Every mission deserves mission control.
