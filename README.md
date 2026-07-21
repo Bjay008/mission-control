@@ -4,6 +4,12 @@
 
 Mission Control keeps long-running missions moving by coordinating AI, tools, and people through clear, explainable decisions.
 
+## Live experience
+
+- [Launch the interactive Mission Control demo](https://mission-control-long-running.trees-net902.chatgpt.site)
+- [View the OpenAI Build Week submission](https://devpost.com/software/mission-control-opjt7a)
+- [Explore the public source repository](https://github.com/Bjay008/mission-control)
+
 It brings three views of the same mission state together:
 
 - **Momentum** gives participants a focused daily action, meaningful streaks, milestones, and recovery.
