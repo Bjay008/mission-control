@@ -1,94 +1,23 @@
 # Mission Control
 
-**Every mission deserves Mission Control.**
+Mission control keeps long-running missions moving. by coordinating AI, tools and people, with clear, explainable decisions.
 
-Mission Control helps people turn long-running missions into completed outcomes by coordinating AI agents, connected tools, and human decisions in one continuous workflow.
-
-## The problem
-
-AI can generate plans and content, but people still have to coordinate tools, remember decisions, identify blockers, manage approvals, and decide what happens next.
-
-## The solution
-
-Mission Control provides:
-
-- mission health
-- task ownership
-- capability-aware routing
-- visible blockers
-- human approval gates
-- decision history
-- persistent mission context
-- a clear next action
+Long-running work breaks down when context gets lost, decisions become unclear, and nobody knows what happens next. Mission Control keeps the work understandable and moving: every task has an owner, every handoff has a reason, and every mission has a clear next step.
 
 ## Proof of concept
 
-Bible in 365 Days demonstrates the system through a real content-production mission involving research, scripting, devotional writing, voiceover preparation, visual planning, thumbnails, SEO, quality control, and publishing.
+Bible in 365 days demonstrates the coordination model. The mission moves through research, planning, generation, and Quality Control. Then it pauses intentionally—not because something failed, but because the next decision belongs to a human.
 
-## The memorable demo
+Once approval is given, Mission Control records the decision, resumes execution, and the mission keeps moving.
 
-> **Create Day 32.**
+The same pattern can coordinate a product launch, a research project, or any complex mission.
 
-Select **Create Episode** once. CEO Brain assembles the specialist company and routes the episode through Research, Script, Devotional, Voice, Visual, Thumbnail, SEO, QC, and Upload Package. The run finishes at **Ready for YouTube** without performing the creator-controlled external upload.
+Every mission deserves mission control.
 
-## Core principle
+## Canonical copy
 
-**The right work goes to the right executor at the right time.**
+- Verbatim narration: [docs/narration-script.md](docs/narration-script.md)
+- Product voice and story spine: [docs/product-voice.md](docs/product-voice.md)
+- Dashboard labels and captions: [docs/dashboard-copy.md](docs/dashboard-copy.md)
 
-## Foundation
-
-- [Vision and MVP](docs/VISION_AND_MVP.md)
-- [Architecture](docs/ARCHITECTURE.md)
-- [Three-minute demo](docs/DEMO_SCRIPT.md)
-- [Hackathon sprint](docs/HACKATHON_SPRINT.md)
-- [Locked decisions](docs/DECISIONS.md)
-- [Demo mission data](data/demo-mission.json)
-- [Autonomous episode pipeline](data/episode-pipeline.json)
-- [DevPost submission draft](docs/DEVPOST_SUBMISSION.md)
-- [Demo video script](docs/DEMO_VIDEO_SCRIPT.md)
-- [Launch checklist](docs/LAUNCH_CHECKLIST.md)
-- [Standalone architecture diagram](docs/ARCHITECTURE_DIAGRAM.md)
-
-## Run the dashboard
-
-The dashboard has no external runtime dependencies. From PowerShell in the repository root, run:
-
-```powershell
-.\start-dashboard.ps1
-```
-
-Then open [http://127.0.0.1:4173](http://127.0.0.1:4173).
-
-The page reads `data/episode-pipeline.json` directly. Select **Create Episode** once to run the frozen CEO → Research → Script → Devotional → Voice → Visual → Thumbnail → SEO → QC → Upload Package workflow. Use **Reset demo** to restore the original source state.
-
-The current runtime is deliberately deterministic. Voice, thumbnail, and upload stages produce inspectable adapter contracts; they do not claim external media rendering or publishing. The OpenAI adapter and API key are deferred until after the hackathon-critical flow is stable.
-
-### Dashboard behavior
-
-- summarizes mission health, confidence, progress, stage, schedule, and momentum
-- makes the blocker and recommended next action immediately visible
-- explains task ownership across AI agents, connected tools, and humans
-- starts the complete ten-stage production workflow from one command
-- routes one accepted artifact into the next executor automatically
-- recalculates mission health from deterministic task progress and risk signals
-- preserves orchestration decisions and stage completion in mission memory
-- stops at a creator-controlled upload package instead of publishing externally
-- restores compatible saved progress after a browser refresh
-- supports desktop and mobile layouts
-
-Run the deterministic engine and data-contract tests with:
-
-```powershell
-npm.cmd test
-```
-
-With the dashboard server running, execute the real-browser smoke test with:
-
-```powershell
-npm.cmd run verify:browser
-```
-
-## Next engineering priority
-
-Add the OpenAI adapter and secure API key behind the tested orchestration contract; do not change the frozen UI or deterministic governance rules.
-
+All user-facing copy must retain the canonical product line exactly.
