@@ -52,6 +52,18 @@ Primary Codex build references:
 - Automated tests cover the shared state, approval transition, and critical copy.
 - No API keys or test account are required for the public judging path.
 
+## Operating system
+
+Mission Control now defines a complete approval-to-notification control loop:
+
+- Airtable records missions, decisions, experiments, and release-channel verification.
+- Resend owns the transactional `mission.decision.required` notification boundary.
+- The app remains the interactive source of shared mission state.
+- A future OpenAI reasoning provider is bounded to recommendations and evidence; it cannot own irreversible decisions.
+- Measurement starts with instrumentation and a baseline, not invented impact claims.
+
+See the [operating-system contract](docs/operating-system.md) and [approval-to-notification pilot](docs/approval-notification-pilot.md).
+
 ## Product principles
 
 - Every task has an owner.
@@ -78,10 +90,11 @@ npm run lint
 - [Product voice](docs/product-voice.md)
 - [Dashboard copy](docs/dashboard-copy.md)
 - [DevPost copy](docs/devpost.md)
+- [Operating system](docs/operating-system.md)
+- [Approval-to-notification pilot](docs/approval-notification-pilot.md)
 
 ## License
 
 MIT — see [LICENSE](LICENSE).
 
 Every mission deserves mission control.
-
